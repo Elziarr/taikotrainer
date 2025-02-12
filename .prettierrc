@@ -1,0 +1,10 @@
+{
+  "singleQuote": true,
+  "arrowParens": "avoid",
+  "importOrderSeparation": true,
+  "plugins": [
+    "prettier-plugin-svelte",
+    "prettier-plugin-tailwindcss",
+    "@trivago/prettier-plugin-sort-imports"
+  ]
+}
