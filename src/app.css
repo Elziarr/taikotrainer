@@ -1,81 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap');
 @import 'tailwindcss';
 
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@theme {
+  --default-font-family: 'Sour Gummy', sans-serif;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+@layer base {
+  input[type='checkbox'] {
+    @apply m-auto grid h-5 w-5 appearance-none place-content-center rounded-sm bg-neutral-400;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+    &::before {
+      content: '';
+      @apply block h-3.5 w-3.5 scale-0 rounded-xs bg-yellow-200;
+    }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+    &:checked::before {
+      @apply scale-100;
+    }
 
-.card {
-  padding: 2em;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+    &:not(:active):hover {
+      @apply bg-neutral-300/70;
+    }
   }
-  a:hover {
-    color: #747bff;
+
+  input[type='number'] {
+    @apply h-5 appearance-none rounded-sm bg-neutral-400 text-center;
+
+    &:not(:focus):hover {
+      @apply bg-neutral-300/70;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      @apply absolute right-0 h-full;
+    }
   }
-  button {
-    background-color: #f9f9f9;
+
+  input[type='range'] {
+    @apply z-10 h-1.5 appearance-none rounded-sm bg-neutral-400;
+
+    &::-moz-range-thumb {
+      @apply h-5 w-2.5 border-none;
+    }
+
+    &::-moz-range-thumb:hover {
+      @apply bg-white;
+    }
+
+    &::-webkit-slider-thumb {
+      @apply h-5 w-2.5 appearance-none rounded-full bg-neutral-200;
+    }
+
+    &::-webkit-slider-thumb:hover {
+      @apply bg-white;
+    }
+  }
+}
+
+@layer components {
+  .button-panel {
+    @apply cursor-pointer rounded-sm bg-neutral-700 px-2 py-1 hover:bg-neutral-600 active:bg-neutral-900;
+  }
+
+  .button-timeline {
+    @apply flex min-h-8 min-w-8 items-center justify-center rounded-sm text-2xl hover:bg-neutral-300/20 active:bg-neutral-800/20;
   }
 }

@@ -1,49 +1,64 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg';
-  import Counter from './lib/Counter.svelte';
-  import viteLogo from '/vite.svg';
+  import AudioTab from './components/AudioTab.svelte';
+  import GameplayTab from './components/GameplayTab.svelte';
+  import KeybindsTab from './components/KeybindsTab.svelte';
+  import MapInfo from './components/MapInfo.svelte';
+  import MapTab from './components/MapTab.svelte';
+  import Playfield from './components/Playfield.svelte';
+  import TabGroup from './components/TabGroup.svelte';
+  import Timeline from './components/Timeline.svelte';
+  import Title from './components/Title.svelte';
+  import MdiFile from '~icons/mdi/file';
+  import MdiKeyboard from '~icons/mdi/keyboard';
+  import MingcuteSettings2Fill from '~icons/mingcute/settings-2-fill';
+  import MingcuteTargetLine from '~icons/mingcute/target-line';
+  import MingcuteVolumeFill from '~icons/mingcute/volume-fill';
 </script>
 
-<main>
-  <div>
-    <a href="https://vite.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
+{#snippet audioTab()}
+  <AudioTab />
+{/snippet}
+
+{#snippet gameplayTab()}
+  <GameplayTab />
+{/snippet}
+
+{#snippet keybindsTab()}
+  <KeybindsTab />
+{/snippet}
+
+{#snippet mapTab()}
+  <MapTab />
+{/snippet}
+
+<main class="flex min-h-screen flex-col">
+  <div class="flex items-start justify-between p-4">
+    <Title class="flex items-end" />
+    <MapInfo />
   </div>
-  <h1>Vite + Svelte</h1>
 
-  <div class="card">
-    <Counter />
+  <div class="mt-1 flex-col">
+    <p class="px-3 text-right">
+      <MingcuteTargetLine class="mb-1 inline" />
+      <span class="text-2xl">99.99%</span>
+    </p>
+
+    <Playfield />
   </div>
 
-  <p>
-    Check out <a
-      href="https://github.com/sveltejs/kit#readme"
-      target="_blank"
-      rel="noreferrer">SvelteKit</a
-    >, the official Svelte app framework powered by Vite!
-  </p>
+  <div class="fixed bottom-0 w-full">
+    <div class="relative -z-10 h-[80vh] max-h-96">
+      <TabGroup
+        class="absolute w-50/100 max-w-[30rem]"
+        items={[
+          { heading: MdiFile, content: mapTab },
+          { heading: MingcuteSettings2Fill, content: gameplayTab },
+          { heading: MingcuteVolumeFill, content: audioTab },
+          { heading: MdiKeyboard, content: keybindsTab },
+        ]}
+      />
+    </div>
 
-  <p class="read-the-docs">Click on the Vite and Svelte logos to learn more</p>
+    <Timeline />
+  </div>
 </main>
-
-<style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
-</style>
