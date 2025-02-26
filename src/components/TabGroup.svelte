@@ -13,6 +13,11 @@
 
   let currentTabIndex: number | null = $state(null);
 
+  $effect(() => {
+    // A bit hacky hehe.
+    setTimeout(() => (currentTabIndex = 0), 1000);
+  });
+
   function handleClick(event: MouseEvent) {
     if (currentTabIndex === null) return;
 
