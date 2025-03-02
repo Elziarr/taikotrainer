@@ -1,11 +1,14 @@
 import type { ChartDiff, ChartInfo } from '../chart/metadata';
+import type { ChartFiles } from './uploading';
 import TJAParser from 'tja';
 
 // NOTE: Ura onis seem to be registered as 'Edit' for some reason, so that has
 // to be taken into account.
 
-export async function loadTjaChartMetadata(diffFile: File): Promise<ChartInfo> {
-  const chartText = await diffFile.text();
+export async function loadTjaChartMetadata(
+  chartFiles: ChartFiles,
+): Promise<ChartInfo> {
+  const chartText = await chartFiles.diffs[0].text();
   const chart = TJAParser.parse(chartText);
 
   const diffs: ChartDiff[] = chart.courses.map(course => {
@@ -16,7 +19,7 @@ export async function loadTjaChartMetadata(diffFile: File): Promise<ChartInfo> {
 
     return {
       name,
-      file: diffFile,
+      file: chartFiles.diffs[0],
       starRating: course.stars,
       isConvert: false,
     };
@@ -27,6 +30,7 @@ export async function loadTjaChartMetadata(diffFile: File): Promise<ChartInfo> {
   diffs.reverse();
 
   return {
+    audioFile: chartFiles.audio,
     title: chart.title,
     artist: chart.subtitle || null,
     creator: null,

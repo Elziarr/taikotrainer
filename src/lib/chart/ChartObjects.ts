@@ -4,7 +4,7 @@ import type {
   KiaiTimeEvent,
   TimingEvent,
 } from './events';
-import type { HitObject } from './hitobjects';
+import { Balloon, Drumroll, HitCircle, type HitObject } from './hitobjects';
 import type { ChartDiff } from './metadata';
 
 type ChartObjectsParams = {
@@ -32,7 +32,7 @@ export class ChartObjects {
     this.kiaiTimeEvents = params.kiaiTimeEvents;
   }
 
-  private getActiveEventIndex(events: BeatmapEvent[], time: number) {
+  private _getActiveEventIndex(events: BeatmapEvent[], time: number) {
     if (events.length === 1 || time < events[0].time) {
       return 0;
     }
@@ -51,11 +51,29 @@ export class ChartObjects {
   }
 
   getActiveDifficultyEventIndex(time: number) {
-    return this.getActiveEventIndex(this.difficultyEvents, time);
+    return this._getActiveEventIndex(this.difficultyEvents, time);
   }
 
   getActiveTimingEventIndex(time: number) {
-    return this.getActiveEventIndex(this.timingEvents, time);
+    return this._getActiveEventIndex(this.timingEvents, time);
+  }
+
+  getDuration(audioDuration: number) {
+    const lastHitObj = this.hitObjects.at(-1);
+
+    let lastHitObjTime = Infinity;
+
+    if (lastHitObj instanceof HitCircle) {
+      lastHitObjTime = lastHitObj.time;
+    } else if (
+      lastHitObj instanceof Drumroll ||
+      lastHitObj instanceof Balloon
+    ) {
+      lastHitObjTime = lastHitObj.endTime;
+    }
+
+    const margin = this.timingEvents.at(-1)!.measureLength;
+    return Math.min(lastHitObjTime + margin, audioDuration);
   }
 
   getVelocityFactor(time: number) {

@@ -7,11 +7,17 @@
   import LoadingOverlay from './components/LoadingOverlay.svelte';
   import Playfield from './components/Playfield.svelte';
   import TabGroup from './components/TabGroup.svelte';
-  import Timeline from './components/Timeline.svelte';
+  import TimelineComponent from './components/Timeline.svelte';
   import Title from './components/Title.svelte';
   import type { ChartObjects } from './lib/chart/ChartObjects';
   import type { ChartInfo as ChartInfoType } from './lib/chart/metadata';
-  import { loadChartMetadata, loadChartObjects } from './lib/loader/loading';
+  import { AudioPlayer } from './lib/gameplay/AudioPlayer.svelte';
+  import { Timeline } from './lib/gameplay/Timeline.svelte';
+  import {
+    loadAudioFile,
+    loadChartMetadata,
+    loadChartObjects,
+  } from './lib/loader/loading';
   import type { ChartFiles } from './lib/loader/uploading';
   import MdiFile from '~icons/mdi/file';
   import MdiKeyboard from '~icons/mdi/keyboard';
@@ -21,26 +27,58 @@
 
   let chartInfo: ChartInfoType | null = $state.raw(null);
   let chartObjects: ChartObjects | null = $state.raw(null);
-  // let beatmapAudio = $state();
+
+  const timeline = new Timeline(handleTimelineTick, handleTimelineSeek);
+  const audioPlayer = new AudioPlayer();
 
   let showLoadingOverlay = $state(false);
 
   async function handleChartUpload(files: ChartFiles) {
     showLoadingOverlay = true;
-    chartInfo = await loadChartMetadata(files.diffs);
-    showLoadingOverlay = false;
 
-    if (!chartInfo) {
+    const nextChartInfo = await loadChartMetadata(files);
+
+    if (!nextChartInfo) {
       alert('Uploaded beatmap does not have taiko diffs.');
+      showLoadingOverlay = false;
+      return;
     }
+
+    chartInfo = nextChartInfo;
+    showLoadingOverlay = false;
   }
 
   async function handleDifficultySelect(index: number) {
     showLoadingOverlay = true;
-    chartObjects = await loadChartObjects(chartInfo!.diffs[index]);
-    showLoadingOverlay = false;
 
-    console.log(chartObjects);
+    // TODO: Don't load the same audio twice (especially when simply diff changing)
+    const chartAudio = await loadAudioFile(chartInfo!.audioFile);
+    audioPlayer.audio = chartAudio;
+
+    chartObjects = await loadChartObjects(chartInfo!.diffs[index]);
+    timeline.chartObjects = chartObjects;
+    timeline.chartDuration =
+      chartObjects?.getDuration(audioPlayer.audio!.duration() * 1000) ?? 0;
+
+    showLoadingOverlay = false;
+  }
+
+  function handleTimelinePlayToggle() {
+    if (timeline.isPlaying) {
+      timeline.pause();
+      audioPlayer.pause();
+    } else {
+      timeline.resume();
+      audioPlayer.resume();
+    }
+  }
+
+  function handleTimelineTick(currTime: number) {
+    audioPlayer.time = currTime;
+  }
+
+  function handleTimelineSeek(nextTime: number) {
+    audioPlayer.seek(nextTime);
   }
 </script>
 
@@ -93,7 +131,18 @@
       />
     </div>
 
-    <Timeline />
+    <TimelineComponent
+      isPlaying={timeline.isPlaying}
+      startTime={timeline.startTime}
+      duration={timeline.chartDuration}
+      time={timeline.time}
+      onplaytoggle={handleTimelinePlayToggle}
+      onrewind={() => timeline.rewind()}
+      onforward={() => timeline.forward()}
+      onrestart={() => timeline.restart()}
+      onrestartfromprevious={() => {}}
+      onseek={nextTime => timeline.seek(nextTime)}
+    />
   </div>
 </main>
 

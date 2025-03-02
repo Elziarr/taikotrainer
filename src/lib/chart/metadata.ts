@@ -13,5 +13,6 @@ export interface ChartMetadata {
 }
 
 export interface ChartInfo extends ChartMetadata {
+  audioFile: File;
   diffs: ChartDiff[];
 }

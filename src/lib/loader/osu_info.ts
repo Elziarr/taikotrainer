@@ -4,6 +4,7 @@ import {
   type ChartInfo,
 } from '../chart/metadata';
 import { readFileAsArrayBuffer } from '../files';
+import type { ChartFiles } from './uploading';
 import { BeatmapDecoder } from 'osu-parsers';
 // @ts-expect-error Complains about no index.d.ts even though there is one...
 import { TaikoRuleset } from 'osu-taiko-stable';
@@ -11,18 +12,19 @@ import { TaikoRuleset } from 'osu-taiko-stable';
 const decoder = new BeatmapDecoder();
 
 export async function loadOsuChartMetadata(
-  diffFiles: File[],
+  chartFiles: ChartFiles,
 ): Promise<ChartInfo | null> {
   const { title, artist, creator, type } = await parseOsuBeatmapMetadata(
-    diffFiles[0],
+    chartFiles.diffs[0],
   );
-  const diffs = await parseOsuBeatmapDiffs(diffFiles);
+  const diffs = await parseOsuBeatmapDiffs(chartFiles.diffs);
 
   if (diffs.length === 0) {
     return null;
   }
 
   return {
+    audioFile: chartFiles.audio,
     title,
     artist,
     creator,
