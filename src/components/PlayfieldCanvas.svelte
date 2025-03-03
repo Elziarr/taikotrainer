@@ -10,6 +10,7 @@
      */
     heightScaleFactor?: number;
     root?: Container;
+    onwidthchange?: (newWidth: number) => void;
   }
 
   let {
@@ -17,6 +18,7 @@
     baseHeight,
     heightScaleFactor = 0.5,
     root = new Container(),
+    onwidthchange = () => {},
   }: Props = $props();
 
   let canvasElem: HTMLCanvasElement;
@@ -25,7 +27,12 @@
 
   $effect(() => {
     pixiApp
-      .init({ antialias: true, canvas: canvasElem, background: '0x353535' })
+      .init({
+        antialias: true,
+        canvas: canvasElem,
+        background: '0x353535',
+        resolution: window.devicePixelRatio,
+      })
       .then(() => resizeToFit());
   });
 
@@ -54,6 +61,8 @@
 
     pixiApp.renderer.resize(canvasWidth / rendererResizeScale, baseHeight);
     canvasElem.style.maxHeight = `${canvasHeight}px`;
+
+    onwidthchange(canvasElem.clientWidth);
   }
 </script>
 

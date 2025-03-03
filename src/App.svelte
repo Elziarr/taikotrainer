@@ -114,8 +114,7 @@
       <span class="text-2xl">99.99%</span>
     </p>
 
-    <!-- <Playfield beatmapObjects={chartObjects} /> -->
-    <Playfield />
+    <Playfield {chartObjects} time={timeline.time} />
   </div>
 
   <div class="fixed bottom-0 w-full">
