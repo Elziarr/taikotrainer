@@ -11,8 +11,10 @@
   import Title from './components/Title.svelte';
   import type { ChartObjects } from './lib/chart/ChartObjects';
   import type { ChartInfo as ChartInfoType } from './lib/chart/metadata';
-  import { AudioPlayer } from './lib/gameplay/AudioPlayer.svelte';
+  import { BeatmapAudioPlayer } from './lib/gameplay/BeatmapAudioPlayer.svelte';
+  import { SfxPlayer } from './lib/gameplay/SfxPlayer.svelte';
   import { Timeline } from './lib/gameplay/Timeline.svelte';
+  import { gameInput, type GameInput } from './lib/gameplay/input.svelte';
   import {
     loadAudioFile,
     loadChartMetadata,
@@ -25,11 +27,14 @@
   import MingcuteTargetLine from '~icons/mingcute/target-line';
   import MingcuteVolumeFill from '~icons/mingcute/volume-fill';
 
+  let playfield: Playfield;
+
   let chartInfo: ChartInfoType | null = $state.raw(null);
   let chartObjects: ChartObjects | null = $state.raw(null);
 
   const timeline = new Timeline(handleTimelineTick, handleTimelineSeek);
-  const audioPlayer = new AudioPlayer();
+  const beatmapAudioPlayer = new BeatmapAudioPlayer();
+  const sfxPlayer = new SfxPlayer();
 
   let showLoadingOverlay = $state(false);
 
@@ -53,54 +58,47 @@
 
     // TODO: Don't load the same audio twice (especially when simply diff changing)
     const chartAudio = await loadAudioFile(chartInfo!.audioFile);
-    audioPlayer.audio = chartAudio;
+    beatmapAudioPlayer.audio = chartAudio;
 
     chartObjects = await loadChartObjects(chartInfo!.diffs[index]);
     timeline.chartObjects = chartObjects;
     timeline.chartDuration =
-      chartObjects?.getDuration(audioPlayer.audio!.duration() * 1000) ?? 0;
+      chartObjects?.getDuration(beatmapAudioPlayer.audio!.duration() * 1000) ??
+      0;
 
     showLoadingOverlay = false;
+  }
+
+  function handleGameInput(input: GameInput) {
+    playfield.displayDrumInput(input.type);
+
+    // TODO: Figure out if currently judging big or small note then play the
+    // appropriate sound.
+    if (input.type === 'left_don' || input.type === 'right_don') {
+      sfxPlayer.playDon();
+    } else {
+      sfxPlayer.playKa();
+    }
   }
 
   function handleTimelinePlayToggle() {
     if (timeline.isPlaying) {
       timeline.pause();
-      audioPlayer.pause();
+      beatmapAudioPlayer.pause();
     } else {
       timeline.resume();
-      audioPlayer.resume();
+      beatmapAudioPlayer.resume();
     }
   }
 
   function handleTimelineTick(currTime: number) {
-    audioPlayer.time = currTime;
+    beatmapAudioPlayer.time = currTime;
   }
 
   function handleTimelineSeek(nextTime: number) {
-    audioPlayer.seek(nextTime);
+    beatmapAudioPlayer.seek(nextTime);
   }
 </script>
-
-{#snippet mapTab()}
-  <ChartTab
-    {chartInfo}
-    onchartupload={handleChartUpload}
-    ondifficultyselect={handleDifficultySelect}
-  />
-{/snippet}
-
-{#snippet gameplayTab()}
-  <GameplayTab />
-{/snippet}
-
-{#snippet audioTab()}
-  <AudioTab />
-{/snippet}
-
-{#snippet keybindsTab()}
-  <KeybindsTab />
-{/snippet}
 
 <main class="flex min-h-screen flex-col">
   <div class="flex items-start justify-between p-4">
@@ -114,7 +112,7 @@
       <span class="text-2xl">99.99%</span>
     </p>
 
-    <Playfield {chartObjects} time={timeline.time} />
+    <Playfield bind:this={playfield} {chartObjects} time={timeline.time} />
   </div>
 
   <div class="fixed bottom-0 w-full">
@@ -148,3 +146,30 @@
 {#if showLoadingOverlay}
   <LoadingOverlay />
 {/if}
+
+<svelte:window
+  use:gameInput={{
+    startTime: timeline.startTime,
+    ongameinput: handleGameInput,
+  }}
+/>
+
+{#snippet mapTab()}
+  <ChartTab
+    {chartInfo}
+    onchartupload={handleChartUpload}
+    ondifficultyselect={handleDifficultySelect}
+  />
+{/snippet}
+
+{#snippet gameplayTab()}
+  <GameplayTab />
+{/snippet}
+
+{#snippet audioTab()}
+  <AudioTab />
+{/snippet}
+
+{#snippet keybindsTab()}
+  <KeybindsTab />
+{/snippet}

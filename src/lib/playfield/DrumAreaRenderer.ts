@@ -1,14 +1,16 @@
+import type { GameInputType } from '../gameplay/input.svelte';
 import { Assets, BitmapText, Container, Sprite } from 'pixi.js';
+import { Ticker } from 'pixi.js';
+
+const DRUM_HIT_FADE_VEL = 0.004;
 
 export class DrumAreaRenderer extends Container {
   private _background = new Sprite();
-
   private _drumBody = new Sprite({ anchor: 0.5 });
   private _leftKa = new Sprite({ anchor: 0.5, alpha: 0 });
   private _leftDon = new Sprite({ anchor: 0.5, alpha: 0 });
   private _rightDon = new Sprite({ anchor: 0.5, alpha: 0 });
   private _rightKa = new Sprite({ anchor: 0.5, alpha: 0 });
-
   private _comboText = new BitmapText({
     anchor: 0.5,
     style: { fontFamily: 'Sour Gummy', fontSize: 30, fill: 0x000000 },
@@ -41,6 +43,9 @@ export class DrumAreaRenderer extends Container {
     document.fonts.onloadingdone = () => {
       this._comboText.text = '0';
     };
+
+    Ticker.shared.add(this._loop);
+    Ticker.shared.start();
   }
 
   private _loadTextures() {
@@ -51,5 +56,46 @@ export class DrumAreaRenderer extends Container {
     this._leftDon.texture = Assets.get('drum_left_don');
     this._rightDon.texture = Assets.get('drum_right_don');
     this._rightKa.texture = Assets.get('drum_right_ka');
+  }
+
+  private _loop = () => {
+    const dt = Ticker.shared.deltaMS;
+
+    this._leftKa.alpha = Math.max(
+      0,
+      this._leftKa.alpha - DRUM_HIT_FADE_VEL * dt,
+    );
+    this._leftDon.alpha = Math.max(
+      0,
+      this._leftDon.alpha - DRUM_HIT_FADE_VEL * dt,
+    );
+    this._rightDon.alpha = Math.max(
+      0,
+      this._rightDon.alpha - DRUM_HIT_FADE_VEL * dt,
+    );
+    this._rightKa.alpha = Math.max(
+      0,
+      this._rightKa.alpha - DRUM_HIT_FADE_VEL * dt,
+    );
+  };
+
+  displayInput(type: GameInputType) {
+    switch (type) {
+      case 'left_ka':
+        this._leftKa.alpha = 1;
+        break;
+
+      case 'left_don':
+        this._leftDon.alpha = 1;
+        break;
+
+      case 'right_don':
+        this._rightDon.alpha = 1;
+        break;
+
+      case 'right_ka':
+        this._rightKa.alpha = 1;
+        break;
+    }
   }
 }

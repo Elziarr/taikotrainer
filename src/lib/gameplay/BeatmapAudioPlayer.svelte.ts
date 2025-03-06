@@ -1,4 +1,4 @@
-export class AudioPlayer {
+export class BeatmapAudioPlayer {
   private _boundToPlay = false;
 
   private _audio = $state<Howl | null>(null);

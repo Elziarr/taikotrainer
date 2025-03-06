@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ChartObjects } from '../lib/chart/ChartObjects';
+  import type { GameInputType } from '../lib/gameplay/input.svelte';
   import {
     BASE_HEIGHT,
     BASE_WIDTH,
@@ -9,7 +10,6 @@
 
   interface Props {
     chartObjects: ChartObjects | null;
-    // inputs: unknown[];
     // judgements: unknown[];
     time: number;
   }
@@ -19,6 +19,10 @@
   const playfield = new Playfield();
   $effect(() => playfield.updateChartObjects(chartObjects));
   $effect(() => playfield.updateTime(time));
+
+  export function displayDrumInput(type: GameInputType) {
+    playfield.displayDrumInput(type);
+  }
 
   function handleWidthChange(newWidth: number) {
     playfield.updateWidth(newWidth);

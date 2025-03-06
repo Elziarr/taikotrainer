@@ -1,4 +1,5 @@
 import type { ChartObjects } from '../chart/ChartObjects';
+import type { GameInputType } from '../gameplay/input.svelte';
 import { DrumAreaRenderer } from './DrumAreaRenderer';
 import { HitObjectsRenderer } from './HitObjectsRenderer';
 import { HitSectionRenderer } from './HitSectionRenderer';
@@ -44,6 +45,10 @@ export class Playfield extends Container {
   }
 
   private _updatePositions() {}
+
+  displayDrumInput(type: GameInputType) {
+    this._drumArea.displayInput(type);
+  }
 
   updateChartObjects(newChartObjects: ChartObjects | null) {
     this._hitObjects.updateChartObjects(newChartObjects);
