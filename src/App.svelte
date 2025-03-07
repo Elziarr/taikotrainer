@@ -11,6 +11,7 @@
   import Title from './components/Title.svelte';
   import type { ChartObjects } from './lib/chart/ChartObjects';
   import type { ChartInfo as ChartInfoType } from './lib/chart/metadata';
+  import { AutoPlayer } from './lib/gameplay/AutoPlayer.svelte';
   import { BeatmapAudioPlayer } from './lib/gameplay/BeatmapAudioPlayer.svelte';
   import { SfxPlayer } from './lib/gameplay/SfxPlayer.svelte';
   import { Timeline } from './lib/gameplay/Timeline.svelte';
@@ -36,7 +37,21 @@
   const beatmapAudioPlayer = new BeatmapAudioPlayer();
   const sfxPlayer = new SfxPlayer();
 
+  const autoplayer = new AutoPlayer({ ongameinput: applyGameInput });
+
   let showLoadingOverlay = $state(false);
+
+  function applyGameInput(input: GameInput) {
+    playfield.displayDrumInput(input.type);
+
+    // TODO: Figure out if currently judging big or small note then play the
+    // appropriate sound.
+    if (input.type === 'left_don' || input.type === 'right_don') {
+      sfxPlayer.playDon();
+    } else {
+      sfxPlayer.playKa();
+    }
+  }
 
   async function handleChartUpload(files: ChartFiles) {
     showLoadingOverlay = true;
@@ -61,24 +76,22 @@
     beatmapAudioPlayer.audio = chartAudio;
 
     chartObjects = await loadChartObjects(chartInfo!.diffs[index]);
+
     timeline.chartObjects = chartObjects;
     timeline.chartDuration =
       chartObjects?.getDuration(beatmapAudioPlayer.audio!.duration() * 1000) ??
       0;
+    autoplayer.chartObjects = chartObjects;
 
     showLoadingOverlay = false;
   }
 
   function handleGameInput(input: GameInput) {
-    playfield.displayDrumInput(input.type);
-
-    // TODO: Figure out if currently judging big or small note then play the
-    // appropriate sound.
-    if (input.type === 'left_don' || input.type === 'right_don') {
-      sfxPlayer.playDon();
-    } else {
-      sfxPlayer.playKa();
+    if (timeline.isPlaying && autoplayer.active) {
+      return;
     }
+
+    applyGameInput(input);
   }
 
   function handleTimelinePlayToggle() {
@@ -86,6 +99,8 @@
       timeline.pause();
       beatmapAudioPlayer.pause();
     } else {
+      autoplayer.active = true;
+
       timeline.resume();
       beatmapAudioPlayer.resume();
     }
@@ -93,10 +108,12 @@
 
   function handleTimelineTick(currTime: number) {
     beatmapAudioPlayer.time = currTime;
+    autoplayer.time = currTime;
   }
 
   function handleTimelineSeek(nextTime: number) {
     beatmapAudioPlayer.seek(nextTime);
+    autoplayer.seek(nextTime);
   }
 </script>
 
