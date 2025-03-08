@@ -9,6 +9,7 @@ export class Timeline {
   private _chartDuration = $state(0);
   private _isPlaying = $state(false);
   private _startTime = $state(0);
+  private _startTimestamp = $state(0);
   private _time = $state(0);
 
   private _ontick: (time: number) => void;
@@ -70,6 +71,10 @@ export class Timeline {
     return this._startTime;
   }
 
+  get startTimestamp() {
+    return this._startTimestamp;
+  }
+
   get time() {
     return this._time;
   }
@@ -121,6 +126,8 @@ export class Timeline {
     this._prevTimestamp = performance.now();
     this._loopId = requestAnimationFrame(this._loop);
     this._isPlaying = true;
+
+    this._startTimestamp = this._prevTimestamp - this._startTime;
   }
 
   restart() {
@@ -137,7 +144,11 @@ export class Timeline {
   }
 
   seek(nextTime: number) {
+    const dt = this._time - nextTime;
+
     this._time = nextTime;
+    this._startTimestamp += dt;
+
     this._onseek(this._time);
   }
 }

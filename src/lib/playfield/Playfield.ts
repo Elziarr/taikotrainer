@@ -1,5 +1,6 @@
 import type { ChartObjects } from '../chart/ChartObjects';
 import type { GameInputType } from '../gameplay/input.svelte';
+import type { HitObjectJudgement } from '../gameplay/judgements';
 import { DrumAreaRenderer } from './DrumAreaRenderer';
 import { HitObjectsRenderer } from './HitObjectsRenderer';
 import { HitSectionRenderer } from './HitSectionRenderer';
@@ -54,8 +55,18 @@ export class Playfield extends Container {
     this._hitObjects.updateChartObjects(newChartObjects);
   }
 
+  updateCurrentJudgementIndex(newCurrentJudgementIndex: number) {
+    this._hitSection.updateCurrentJudgementIndex(newCurrentJudgementIndex);
+  }
+
+  updateJudgements(newJudgements: HitObjectJudgement[]) {
+    this._hitObjects.updateJudgements(newJudgements);
+    this._hitSection.updateJudgements(newJudgements);
+  }
+
   updateTime(newTime: number) {
     this._hitObjects.updateTime(newTime);
+    this._hitSection.updateTime(newTime);
   }
 
   updateWidth(newWidth: number) {

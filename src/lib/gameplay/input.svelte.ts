@@ -6,14 +6,14 @@ export interface GameInput {
 }
 
 interface GameInputProps {
-  startTime: number;
+  getStartTimestamp: () => number;
   ongameinput: (input: GameInput) => void;
 }
 
 // TODO: Handle custom keybinds
 export function gameInput(
   node: HTMLElement,
-  { startTime, ongameinput }: GameInputProps,
+  { getStartTimestamp, ongameinput }: GameInputProps,
 ) {
   let leftKaDown = false;
   let leftDonDown = false;
@@ -22,21 +22,31 @@ export function gameInput(
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'd' && !leftKaDown) {
-      ongameinput({ type: 'left_ka', time: e.timeStamp - startTime });
+      ongameinput({ type: 'left_ka', time: e.timeStamp - getStartTimestamp() });
       leftKaDown = true;
     }
+
     if (e.key === 'f' && !leftDonDown) {
-      ongameinput({ type: 'left_don', time: e.timeStamp - startTime });
+      ongameinput({
+        type: 'left_don',
+        time: e.timeStamp - getStartTimestamp(),
+      });
       leftDonDown = true;
     }
 
     if (e.key === 'j' && !rightDonDown) {
-      ongameinput({ type: 'right_don', time: e.timeStamp - startTime });
+      ongameinput({
+        type: 'right_don',
+        time: e.timeStamp - getStartTimestamp(),
+      });
       rightDonDown = true;
     }
 
     if (e.key === 'k' && !rightKaDown) {
-      ongameinput({ type: 'right_ka', time: e.timeStamp - startTime });
+      ongameinput({
+        type: 'right_ka',
+        time: e.timeStamp - getStartTimestamp(),
+      });
       rightKaDown = true;
     }
   }

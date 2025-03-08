@@ -13,9 +13,11 @@
   import type { ChartInfo as ChartInfoType } from './lib/chart/metadata';
   import { AutoPlayer } from './lib/gameplay/AutoPlayer.svelte';
   import { BeatmapAudioPlayer } from './lib/gameplay/BeatmapAudioPlayer.svelte';
+  import { Judger } from './lib/gameplay/Judger.svelte';
   import { SfxPlayer } from './lib/gameplay/SfxPlayer.svelte';
   import { Timeline } from './lib/gameplay/Timeline.svelte';
   import { gameInput, type GameInput } from './lib/gameplay/input.svelte';
+  import { HitCircleJudgement } from './lib/gameplay/judgements';
   import {
     loadAudioFile,
     loadChartMetadata,
@@ -37,19 +39,34 @@
   const beatmapAudioPlayer = new BeatmapAudioPlayer();
   const sfxPlayer = new SfxPlayer();
 
+  const judger = new Judger();
   const autoplayer = new AutoPlayer({ ongameinput: applyGameInput });
 
   let showLoadingOverlay = $state(false);
 
   function applyGameInput(input: GameInput) {
+    judger.judgeInput(input);
     playfield.displayDrumInput(input.type);
 
-    // TODO: Figure out if currently judging big or small note then play the
-    // appropriate sound.
+    const prevJudgeIndex = Math.max(0, judger.currentIndex - 1);
+    const prevJudgeRecord = judger.judgements[prevJudgeIndex];
+    const toPlayBigSound =
+      prevJudgeRecord instanceof HitCircleJudgement &&
+      prevJudgeRecord.input !== null &&
+      prevJudgeRecord.hitBigCorrectly;
+
     if (input.type === 'left_don' || input.type === 'right_don') {
-      sfxPlayer.playDon();
+      if (toPlayBigSound) {
+        sfxPlayer.playBigDon();
+      } else {
+        sfxPlayer.playDon();
+      }
     } else {
-      sfxPlayer.playKa();
+      if (toPlayBigSound) {
+        sfxPlayer.playBigKa();
+      } else {
+        sfxPlayer.playKa();
+      }
     }
   }
 
@@ -81,6 +98,7 @@
     timeline.chartDuration =
       chartObjects?.getDuration(beatmapAudioPlayer.audio!.duration() * 1000) ??
       0;
+    judger.chartObjects = chartObjects;
     autoplayer.chartObjects = chartObjects;
 
     showLoadingOverlay = false;
@@ -99,7 +117,7 @@
       timeline.pause();
       beatmapAudioPlayer.pause();
     } else {
-      autoplayer.active = true;
+      // autoplayer.active = true;
 
       timeline.resume();
       beatmapAudioPlayer.resume();
@@ -108,11 +126,13 @@
 
   function handleTimelineTick(currTime: number) {
     beatmapAudioPlayer.time = currTime;
+    judger.time = currTime;
     autoplayer.time = currTime;
   }
 
   function handleTimelineSeek(nextTime: number) {
     beatmapAudioPlayer.seek(nextTime);
+    judger.seek(nextTime);
     autoplayer.seek(nextTime);
   }
 </script>
@@ -129,7 +149,13 @@
       <span class="text-2xl">99.99%</span>
     </p>
 
-    <Playfield bind:this={playfield} {chartObjects} time={timeline.time} />
+    <Playfield
+      bind:this={playfield}
+      {chartObjects}
+      currentJudgementIndex={judger.currentIndex}
+      judgements={judger.judgements}
+      time={timeline.time}
+    />
   </div>
 
   <div class="fixed bottom-0 w-full">
@@ -166,7 +192,7 @@
 
 <svelte:window
   use:gameInput={{
-    startTime: timeline.startTime,
+    getStartTimestamp: () => timeline.startTimestamp,
     ongameinput: handleGameInput,
   }}
 />

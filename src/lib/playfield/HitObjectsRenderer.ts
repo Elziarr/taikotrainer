@@ -5,6 +5,12 @@ import {
   HitCircle,
   type HitObject,
 } from '../chart/hitobjects';
+import type {
+  BalloonJudgement,
+  DrumrollJudgement,
+  HitCircleJudgement,
+  HitObjectJudgement,
+} from '../gameplay/judgements';
 import { BalloonSprite } from './BalloonSprite';
 import { DrumrollSprite } from './DrumrollSprite';
 import { HitCircleSprite } from './HitObjectSprite';
@@ -18,6 +24,7 @@ const APPEAR_RENDER_OFFSET = 100;
 
 export class HitObjectsRenderer extends Container {
   private _chartObjects: ChartObjects | null = null;
+  private _judgements: HitObjectJudgement[] = [];
   private _time: number = 0;
 
   private _leftMargin = 0;
@@ -131,6 +138,15 @@ export class HitObjectsRenderer extends Container {
     sprite.x = xPos;
     sprite.y = this._playfieldHeight / 2;
 
+    const record = this._judgements[ho.index] as BalloonJudgement;
+
+    if (record && record.inputs.length === record.targetCount) {
+      const dt = this._time - record.inputs.at(-1)!.time;
+
+      sprite.scale = 0.03 * dt;
+      sprite.alpha = 1 - Math.min(1, 0.006 * dt);
+    }
+
     this.addChild(sprite);
     return false;
   }
@@ -157,6 +173,23 @@ export class HitObjectsRenderer extends Container {
     sprite.setIsBig(ho.isBig);
 
     this.addChild(sprite);
+
+    const record = this._judgements[ho.index] as DrumrollJudgement;
+
+    for (const input of record.inputs) {
+      const hitSprite = new HitCircleSprite();
+      hitSprite.setType(
+        input.type === 'left_ka' || input.type === 'right_ka',
+        ho.isBig,
+      );
+
+      hitSprite.x = -1 * (input.time - this._time) + this._leftMargin;
+      hitSprite.y = 1 * (input.time - this._time) + this._playfieldHeight / 2;
+      hitSprite.alpha = 0.008 * (input.time - this._time) + 1;
+
+      this.addChild(hitSprite);
+    }
+
     return false;
   }
 
@@ -177,8 +210,28 @@ export class HitObjectsRenderer extends Container {
     sprite.zIndex = -Math.floor(ho.time);
     sprite.setType(ho.isKa, ho.isBig);
 
-    sprite.x = defaultXPos;
-    sprite.y = this._playfieldHeight / 2;
+    const record = this._judgements[ho.index] as HitCircleJudgement;
+
+    if (
+      record &&
+      record.input !== null &&
+      record.judgement !== 'late_miss' &&
+      record.judgement !== 'early_miss'
+    ) {
+      const xPos =
+        this._getVelocity(ho.time) * (ho.time - record.input.time) +
+        this._leftMargin;
+
+      sprite.x = -(record.input.time - this._time) + xPos;
+      sprite.y = record.input.time - this._time + this._playfieldHeight / 2;
+      sprite.alpha = 0.008 * (record.input.time - this._time) + 1;
+    } else if (
+      record &&
+      (record.input === null || record.judgement === 'late_miss')
+    ) {
+      sprite.x = defaultXPos;
+      sprite.y = this._playfieldHeight / 2;
+    }
 
     this.addChild(sprite);
     return false;
@@ -205,6 +258,10 @@ export class HitObjectsRenderer extends Container {
     this._latestStartIndex = 0;
 
     this._render();
+  }
+
+  updateJudgements(newJudgements: HitObjectJudgement[]) {
+    this._judgements = newJudgements;
   }
 
   updateTime(newTime: number) {
