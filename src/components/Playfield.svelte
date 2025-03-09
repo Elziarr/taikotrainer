@@ -11,22 +11,32 @@
 
   interface Props {
     chartObjects: ChartObjects | null;
+    combo: number;
     currentJudgementIndex: number;
     judgements: HitObjectJudgement[];
     time: number;
   }
 
-  let { chartObjects, currentJudgementIndex, judgements, time }: Props =
+  let { chartObjects, combo, currentJudgementIndex, judgements, time }: Props =
     $props();
 
   const playfield = new Playfield();
   $effect(() => playfield.updateChartObjects(chartObjects));
+  $effect(() => playfield.updateCombo(combo));
   $effect(() => playfield.updateCurrentJudgementIndex(currentJudgementIndex));
   $effect(() => playfield.updateJudgements(judgements));
   $effect(() => playfield.updateTime(time));
 
   export function displayDrumInput(type: GameInputType) {
     playfield.displayDrumInput(type);
+  }
+
+  export function displayHitDelta(dt: number) {
+    playfield.displayHitDelta(dt);
+  }
+
+  export function resetJudgements() {
+    playfield.resetJudgements();
   }
 
   function handleWidthChange(newWidth: number) {

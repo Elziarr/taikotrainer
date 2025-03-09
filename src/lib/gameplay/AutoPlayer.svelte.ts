@@ -101,14 +101,16 @@ export class AutoPlayer {
 
         if (ho.isKa) {
           this._inputs.push({
-            time: ho.time,
+            time: ho.time + (2 * Math.random() - 1) * 20,
+            // time: ho.time + 24,
             type: atLeftSide ? 'left_ka' : 'right_ka',
           });
 
           atLeftSide = !atLeftSide;
         } else {
           this._inputs.push({
-            time: ho.time,
+            time: ho.time + (2 * Math.random() - 1) * 20,
+            // time: ho.time + 24,
             type: atLeftSide ? 'left_don' : 'right_don',
           });
 

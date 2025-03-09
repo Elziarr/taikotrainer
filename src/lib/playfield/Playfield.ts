@@ -5,18 +5,21 @@ import { DrumAreaRenderer } from './DrumAreaRenderer';
 import { HitObjectsRenderer } from './HitObjectsRenderer';
 import { HitSectionRenderer } from './HitSectionRenderer';
 import { TrackRenderer } from './TrackRenderer';
+import { URBar } from './URBar.svelte';
 import { Assets, Container } from 'pixi.js';
 
 export const BASE_WIDTH = 800;
 export const BASE_HEIGHT = 250;
 
 const HIT_SECTION_MARGIN = 120;
+const UR_BAR_Y_MARGIN = 15;
 
 export class Playfield extends Container {
   private _drumArea = new DrumAreaRenderer();
   private _hitObjects = new HitObjectsRenderer();
   private _hitSection = new HitSectionRenderer();
   private _track = new TrackRenderer();
+  private _urBar = new URBar();
 
   constructor() {
     super();
@@ -27,12 +30,11 @@ export class Playfield extends Container {
       this._hitSection,
       this._hitObjects,
       this._drumArea,
+      this._urBar,
     );
 
     // Enclose in setTimeout() to wait for textures to load in children.
     setTimeout(async () => {
-      this._updatePositions();
-
       const mainHeight = (await Assets.load('playfield_left')).height;
       this._track.height = mainHeight;
 
@@ -45,14 +47,24 @@ export class Playfield extends Container {
     }, 0);
   }
 
-  private _updatePositions() {}
-
   displayDrumInput(type: GameInputType) {
     this._drumArea.displayInput(type);
   }
 
+  displayHitDelta(dt: number) {
+    this._urBar.displayHitDelta(dt);
+  }
+
+  resetJudgements() {
+    this._urBar.resetJudgements();
+  }
+
   updateChartObjects(newChartObjects: ChartObjects | null) {
     this._hitObjects.updateChartObjects(newChartObjects);
+  }
+
+  updateCombo(combo: number) {
+    this._drumArea.updateCombo(combo);
   }
 
   updateCurrentJudgementIndex(newCurrentJudgementIndex: number) {
@@ -70,6 +82,10 @@ export class Playfield extends Container {
   }
 
   updateWidth(newWidth: number) {
+    this._urBar.x = newWidth / 2 - this._urBar.width / 2;
+    this._urBar.y =
+      this._drumArea.height + this._urBar.height / 2 + UR_BAR_Y_MARGIN;
+
     this._track.updateWidth(newWidth);
     this._hitObjects.updatePlayfieldWidth(newWidth);
   }

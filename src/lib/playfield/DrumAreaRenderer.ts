@@ -98,4 +98,8 @@ export class DrumAreaRenderer extends Container {
         break;
     }
   }
+
+  updateCombo(combo: number) {
+    this._comboText.text = combo;
+  }
 }

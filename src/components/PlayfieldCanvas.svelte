@@ -30,7 +30,7 @@
       .init({
         antialias: true,
         canvas: canvasElem,
-        background: '0x353535',
+        // background: '0x353535',
         resolution: window.devicePixelRatio,
       })
       .then(() => resizeToFit());

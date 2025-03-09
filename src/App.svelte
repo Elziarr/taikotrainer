@@ -18,6 +18,7 @@
   import { Timeline } from './lib/gameplay/Timeline.svelte';
   import { gameInput, type GameInput } from './lib/gameplay/input.svelte';
   import { HitCircleJudgement } from './lib/gameplay/judgements';
+  import { Scorer } from './lib/gameplay/scorer.svelte';
   import {
     loadAudioFile,
     loadChartMetadata,
@@ -39,7 +40,18 @@
   const beatmapAudioPlayer = new BeatmapAudioPlayer();
   const sfxPlayer = new SfxPlayer();
 
-  const judger = new Judger();
+  const judger = new Judger({
+    ongreat: dt => {
+      scorer.scoreGreat();
+      playfield.displayHitDelta(dt);
+    },
+    ongood: dt => {
+      scorer.scoreGood();
+      playfield.displayHitDelta(dt);
+    },
+    onmiss: () => scorer.scoreMiss(),
+  });
+  const scorer = new Scorer();
   const autoplayer = new AutoPlayer({ ongameinput: applyGameInput });
 
   let showLoadingOverlay = $state(false);
@@ -117,7 +129,7 @@
       timeline.pause();
       beatmapAudioPlayer.pause();
     } else {
-      // autoplayer.active = true;
+      autoplayer.active = true;
 
       timeline.resume();
       beatmapAudioPlayer.resume();
@@ -132,8 +144,11 @@
 
   function handleTimelineSeek(nextTime: number) {
     beatmapAudioPlayer.seek(nextTime);
-    judger.seek(nextTime);
     autoplayer.seek(nextTime);
+
+    judger.resetTo(nextTime);
+    scorer.reset();
+    playfield.resetJudgements();
   }
 </script>
 
@@ -146,12 +161,13 @@
   <div class="flex-col">
     <p class="px-3 text-right">
       <MingcuteTargetLine class="mb-1 inline" />
-      <span class="text-2xl">99.99%</span>
+      <span class="text-2xl">{scorer.accuracy.toFixed(2)}%</span>
     </p>
 
     <Playfield
       bind:this={playfield}
       {chartObjects}
+      combo={scorer.combo}
       currentJudgementIndex={judger.currentIndex}
       judgements={judger.judgements}
       time={timeline.time}

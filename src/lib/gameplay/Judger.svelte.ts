@@ -8,6 +8,12 @@ import {
   type HitObjectJudgement,
 } from './judgements';
 
+interface JudgerParams {
+  onmiss: () => void;
+  ongood: (dt: number) => void;
+  ongreat: (dt: number) => void;
+}
+
 const BIG_HITCIRCLE_WINDOW = 30;
 
 const GREAT_WINDOW = 25;
@@ -21,6 +27,16 @@ export class Judger {
   private _judgements: HitObjectJudgement[] = $state([]);
   private _currentIndex = $state(0);
   private _previousInputTime = 0;
+
+  private _onmiss: JudgerParams['onmiss'];
+  private _ongood: JudgerParams['ongood'];
+  private _ongreat: JudgerParams['ongreat'];
+
+  constructor(params: JudgerParams) {
+    this._onmiss = params.onmiss;
+    this._ongood = params.ongood;
+    this._ongreat = params.ongreat;
+  }
 
   get chartObjects() {
     return this._chartObjects;
@@ -137,10 +153,13 @@ export class Judger {
 
     if (absTimeDiff < GREAT_WINDOW) {
       record.judgement = 'great';
+      this._ongreat(timeDiff);
     } else if (absTimeDiff < OK_WINDOW) {
       record.judgement = 'good';
+      this._ongood(timeDiff);
     } else if (absTimeDiff <= MISS_WINDOW) {
       record.judgement = 'early_miss';
+      this._onmiss();
     }
 
     // Don't increment currentIndex yet to account for big notes which are hit
@@ -174,11 +193,12 @@ export class Judger {
       return true;
     }
 
-    // If the hitcircle was already previously judged; this handles big
-    // hit circles which do not increment currentIndex directly on the initial
+    // Don't judge already previously judged hit circles; this handles big hit
+    // circles which do not increment currentIndex directly on the initial
     // input.
-    if (record.judgement !== null) {
+    if (record.judgement === null) {
       record.judgement = 'late_miss';
+      this._onmiss();
     }
 
     this._currentIndex += 1;
@@ -245,7 +265,7 @@ export class Judger {
     this._previousInputTime = input.time;
   }
 
-  seek(newTime: number) {
+  resetTo(newTime: number) {
     this._time = newTime;
     this._previousInputTime = -Infinity;
 
