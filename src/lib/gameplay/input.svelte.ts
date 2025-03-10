@@ -1,3 +1,5 @@
+import { KeybindSettings } from './settings/keybinds.svelte';
+
 export type GameInputType = 'left_ka' | 'left_don' | 'right_don' | 'right_ka';
 
 export interface GameInput {
@@ -21,12 +23,16 @@ export function gameInput(
   let rightKaDown = false;
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'd' && !leftKaDown) {
+    if (KeybindSettings.keybindSetPending) {
+      return;
+    }
+
+    if (e.key === KeybindSettings.getKeybind('leftKa') && !leftKaDown) {
       ongameinput({ type: 'left_ka', time: e.timeStamp - getStartTimestamp() });
       leftKaDown = true;
     }
 
-    if (e.key === 'f' && !leftDonDown) {
+    if (e.key === KeybindSettings.getKeybind('leftDon') && !leftDonDown) {
       ongameinput({
         type: 'left_don',
         time: e.timeStamp - getStartTimestamp(),
@@ -34,7 +40,7 @@ export function gameInput(
       leftDonDown = true;
     }
 
-    if (e.key === 'j' && !rightDonDown) {
+    if (e.key === KeybindSettings.getKeybind('rightDon') && !rightDonDown) {
       ongameinput({
         type: 'right_don',
         time: e.timeStamp - getStartTimestamp(),
@@ -42,7 +48,7 @@ export function gameInput(
       rightDonDown = true;
     }
 
-    if (e.key === 'k' && !rightKaDown) {
+    if (e.key === KeybindSettings.getKeybind('rightKa') && !rightKaDown) {
       ongameinput({
         type: 'right_ka',
         time: e.timeStamp - getStartTimestamp(),
@@ -52,19 +58,19 @@ export function gameInput(
   }
 
   function handleKeyup(e: KeyboardEvent) {
-    if (e.key === 'd' && leftKaDown) {
+    if (e.key === KeybindSettings.getKeybind('leftKa') && leftKaDown) {
       leftKaDown = false;
     }
 
-    if (e.key === 'f' && leftDonDown) {
+    if (e.key === KeybindSettings.getKeybind('leftDon') && leftDonDown) {
       leftDonDown = false;
     }
 
-    if (e.key === 'j' && rightDonDown) {
+    if (e.key === KeybindSettings.getKeybind('rightDon') && rightDonDown) {
       rightDonDown = false;
     }
 
-    if (e.key === 'k' && rightKaDown) {
+    if (e.key === KeybindSettings.getKeybind('rightKa') && rightKaDown) {
       rightKaDown = false;
     }
   }

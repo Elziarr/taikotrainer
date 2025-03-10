@@ -1,3 +1,5 @@
+export const MIN_MULTIPLIER_VALUE = 0.05;
+
 class _GameplaySettings {
   autoplay = $state(true);
   coloredJudgements = $state(false);

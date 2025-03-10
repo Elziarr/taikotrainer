@@ -18,6 +18,7 @@
   import { Timeline } from './lib/gameplay/Timeline.svelte';
   import { gameInput, type GameInput } from './lib/gameplay/input.svelte';
   import { HitCircleJudgement } from './lib/gameplay/judgements';
+  import { handleKeybinds } from './lib/gameplay/keybinds';
   import { Scorer } from './lib/gameplay/scorer.svelte';
   import { GameplaySettings } from './lib/gameplay/settings/gameplay.svelte';
   import {
@@ -68,6 +69,44 @@
     judger.greatWindow = GameplaySettings.judgementWindows.great;
     judger.goodWindow = GameplaySettings.judgementWindows.good;
     judger.missWindow = GameplaySettings.judgementWindows.miss;
+  });
+
+  handleKeybinds({
+    onautoplaytoggle: () =>
+      (GameplaySettings.autoplay = !GameplaySettings.autoplay),
+    ondensitydown: () =>
+      (GameplaySettings.densityMultiplier = Math.max(
+        0.1,
+        GameplaySettings.densityMultiplier - 0.1,
+      )),
+    ondensityup: () => (GameplaySettings.densityMultiplier += 0.1),
+    onfinedensitydown: () =>
+      (GameplaySettings.densityMultiplier = Math.max(
+        0.05,
+        GameplaySettings.densityMultiplier - 0.05,
+      )),
+    onfinedensityup: () => (GameplaySettings.densityMultiplier += 0.05),
+    onfineslowdown: () =>
+      (GameplaySettings.speedMultiplier = Math.max(
+        0.05,
+        GameplaySettings.speedMultiplier - 0.05,
+      )),
+    onfinespeedup: () => (GameplaySettings.speedMultiplier += 0.05),
+    onforward: () => timeline.forward(),
+    onlongforward: () => timeline.forward(2.5),
+    onlongrewind: () => timeline.rewind(2.5),
+    onplaybacktoggle: handleTimelinePlayToggle,
+    onrestart: () => timeline.restart(),
+    onrestartfromprevious: () => {},
+    onrewind: () => timeline.rewind(),
+    onshortforward: () => timeline.forward(0.4),
+    onshortrewind: () => timeline.rewind(0.4),
+    onslowdown: () =>
+      (GameplaySettings.speedMultiplier = Math.max(
+        0.1,
+        GameplaySettings.speedMultiplier - 0.1,
+      )),
+    onspeedup: () => (GameplaySettings.speedMultiplier += 0.1),
   });
 
   function applyGameInput(input: GameInput) {

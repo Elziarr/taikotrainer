@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { GameplaySettings } from '../lib/gameplay/settings/gameplay.svelte';
+  import {
+    MIN_MULTIPLIER_VALUE,
+    type GameplaySettings,
+  } from '../lib/gameplay/settings/gameplay.svelte';
   import SettingGroup from './SettingGroup.svelte';
 
   interface Props {
@@ -20,8 +23,8 @@
       class="flex-1"
       id="speedMultipler"
       type="number"
-      min="0.1"
-      step="0.1"
+      min={MIN_MULTIPLIER_VALUE}
+      step="0.05"
       value={settings.speedMultiplier.toFixed(2)}
       oninput={e => {
         const target = e.target as HTMLInputElement;
@@ -34,8 +37,8 @@
       class="flex-1"
       id="densityMultiplier"
       type="number"
-      min="0.1"
-      step="0.1"
+      min={MIN_MULTIPLIER_VALUE}
+      step="0.05"
       value={settings.densityMultiplier.toFixed(2)}
       oninput={e => {
         const target = e.target as HTMLInputElement;

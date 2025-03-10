@@ -39,6 +39,7 @@
     "vite": "^6.1.0"
   },
   "dependencies": {
+    "eventemitter3": "^5.0.1",
     "hotkeys-js": "^3.13.9",
     "howler": "^2.2.4",
     "osu-parsers": "^4.1.7",
