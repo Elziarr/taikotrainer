@@ -12,6 +12,8 @@ export class Timeline {
   private _startTimestamp = $state(0);
   private _time = $state(0);
 
+  private _speedMultiplier = 1;
+
   private _ontick: (time: number) => void;
   private _onseek: (nextTime: number) => void;
 
@@ -67,6 +69,14 @@ export class Timeline {
     return this._isPlaying;
   }
 
+  get speedMultiplier() {
+    return this._speedMultiplier;
+  }
+
+  set speedMultiplier(v: number) {
+    this._speedMultiplier = v;
+  }
+
   get startTime() {
     return this._startTime;
   }
@@ -87,7 +97,7 @@ export class Timeline {
     const dt = currTimestamp - this._prevTimestamp;
     this._prevTimestamp = currTimestamp;
 
-    this._tick(dt);
+    this._tick(dt * this._speedMultiplier);
     this._ontick(this._time);
 
     this._loopId = requestAnimationFrame(this._loop);

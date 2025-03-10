@@ -63,12 +63,32 @@ export class Playfield extends Container {
     this._hitObjects.updateChartObjects(newChartObjects);
   }
 
-  updateCombo(combo: number) {
-    this._drumArea.updateCombo(combo);
+  updateColoredJudgements(newColoredJudgements: boolean) {
+    this._hitSection.updateColoredJudgements(newColoredJudgements);
+  }
+
+  updateCombo(newCombo: number) {
+    this._drumArea.updateCombo(newCombo);
+  }
+
+  updateConstantDensity(newConstantDensity: boolean) {
+    this._hitObjects.updateConstantDensity(newConstantDensity);
   }
 
   updateCurrentJudgementIndex(newCurrentJudgementIndex: number) {
     this._hitSection.updateCurrentJudgementIndex(newCurrentJudgementIndex);
+  }
+
+  updateDensityMultiplier(newDensityMultiplier: number) {
+    this._hitObjects.updateDensityMultiplier(newDensityMultiplier);
+  }
+
+  updateGoodWindow(newGoodWindow: number) {
+    this._urBar.updateGoodWindow(newGoodWindow);
+  }
+
+  updateGreatWindow(newGreatWindow: number) {
+    this._urBar.updateGreatWindow(newGreatWindow);
   }
 
   updateJudgements(newJudgements: HitObjectJudgement[]) {

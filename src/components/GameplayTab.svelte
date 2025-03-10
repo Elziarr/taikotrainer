@@ -1,5 +1,16 @@
 <script lang="ts">
+  import type { GameplaySettings } from '../lib/gameplay/settings/gameplay.svelte';
   import SettingGroup from './SettingGroup.svelte';
+
+  interface Props {
+    settings: GameplaySettings;
+  }
+
+  let { settings }: Props = $props();
+
+  function clamp(val: number, min: number, max: number) {
+    return Math.min(Math.max(val, min), max);
+  }
 </script>
 
 <div class="flex flex-col gap-4">
@@ -11,6 +22,11 @@
       type="number"
       min="0.1"
       step="0.1"
+      value={settings.speedMultiplier.toFixed(2)}
+      oninput={e => {
+        const target = e.target as HTMLInputElement;
+        settings.speedMultiplier = parseFloat(target.value!);
+      }}
     />
 
     <label for="densityMultiplier">Density Multiplier</label>
@@ -20,26 +36,86 @@
       type="number"
       min="0.1"
       step="0.1"
+      value={settings.densityMultiplier.toFixed(2)}
+      oninput={e => {
+        const target = e.target as HTMLInputElement;
+        settings.densityMultiplier = parseFloat(target.value!);
+      }}
     />
 
     <label for="constantDensity">Constant Density</label>
-    <input id="constantDensity" type="checkbox" />
+    <input
+      id="constantDensity"
+      type="checkbox"
+      bind:checked={settings.constantDensity}
+    />
 
     <label for="autoplay">Autoplay</label>
-    <input id="autoplay" type="checkbox" />
+    <input id="autoplay" type="checkbox" bind:checked={settings.autoplay} />
   </SettingGroup>
 
   <SettingGroup heading="Timing">
     <label for="coloredJudgements">Colored Judgements</label>
-    <input id="coloredJudgements" type="checkbox" />
+    <input
+      id="coloredJudgements"
+      type="checkbox"
+      bind:checked={settings.coloredJudgements}
+    />
 
-    <label for="greatWindow">Great Window</label>
-    <input class="flex-1" id="greatWindow" type="number" min="0.1" step="0.1" />
+    <label for="greatWindow">Great Window (ms)</label>
+    <input
+      class="flex-1"
+      id="greatWindow"
+      type="number"
+      min="1"
+      max={settings.judgementWindows.good - 1}
+      step="0.1"
+      value={settings.judgementWindows.great}
+      onchange={e => {
+        const target = e.target as HTMLInputElement;
+        settings.judgementWindows.great = clamp(
+          Number(target.value),
+          parseFloat(target.min),
+          parseFloat(target.max),
+        );
+      }}
+    />
 
-    <label for="goodWindow">Good Window</label>
-    <input class="flex-1" id="goodWindow" type="number" min="0.1" step="0.1" />
+    <label for="goodWindow">Good Window (ms)</label>
+    <input
+      class="flex-1"
+      id="goodWindow"
+      type="number"
+      step="0.1"
+      min={settings.judgementWindows.great + 1}
+      max={settings.judgementWindows.miss - 1}
+      value={settings.judgementWindows.good}
+      onchange={e => {
+        const target = e.target as HTMLInputElement;
+        settings.judgementWindows.good = clamp(
+          Number(target.value),
+          parseFloat(target.min),
+          parseFloat(target.max),
+        );
+      }}
+    />
 
-    <label for="badWindow">Bad Window</label>
-    <input class="flex-1" id="badWindow" type="number" min="0.1" step="0.1" />
+    <label for="missWindow">Miss Window (ms)</label>
+    <input
+      class="flex-1"
+      id="missWindow"
+      type="number"
+      min={settings.judgementWindows.good + 1}
+      step="0.1"
+      value={settings.judgementWindows.miss}
+      onchange={e => {
+        const target = e.target as HTMLInputElement;
+        settings.judgementWindows.miss = clamp(
+          Number(target.value),
+          parseFloat(target.min),
+          parseFloat(target.max),
+        );
+      }}
+    />
   </SettingGroup>
 </div>

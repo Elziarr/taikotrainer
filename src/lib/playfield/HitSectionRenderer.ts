@@ -9,7 +9,6 @@ export class HitSectionRenderer extends Container {
   private _judgements: HitObjectJudgement[] = [];
   private _time = 0;
 
-  // TODO
   private _toggleJudgementFlash = false;
 
   private _mainSprite = new Sprite({ anchor: 0.5 });
@@ -60,10 +59,13 @@ export class HitSectionRenderer extends Container {
     }
   }
 
+  updateColoredJudgements(newColoredJudgements: boolean) {
+    this._toggleJudgementFlash = newColoredJudgements;
+  }
+
   updateCurrentJudgementIndex(newCurrentJudgementIndex: number) {
     this._currentJudgementIndex = newCurrentJudgementIndex;
   }
-
   updateJudgements(newJudgements: HitObjectJudgement[]) {
     this._judgements = newJudgements;
   }

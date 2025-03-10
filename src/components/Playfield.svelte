@@ -11,19 +11,39 @@
 
   interface Props {
     chartObjects: ChartObjects | null;
+    coloredJudgements: boolean;
     combo: number;
+    constantDensity: boolean;
     currentJudgementIndex: number;
+    densityMultiplier: number;
+    goodWindow: number;
+    greatWindow: number;
     judgements: HitObjectJudgement[];
     time: number;
   }
 
-  let { chartObjects, combo, currentJudgementIndex, judgements, time }: Props =
-    $props();
+  let {
+    chartObjects,
+    coloredJudgements,
+    combo,
+    constantDensity,
+    currentJudgementIndex,
+    densityMultiplier,
+    goodWindow,
+    greatWindow,
+    judgements,
+    time,
+  }: Props = $props();
 
   const playfield = new Playfield();
   $effect(() => playfield.updateChartObjects(chartObjects));
+  $effect(() => playfield.updateColoredJudgements(coloredJudgements));
   $effect(() => playfield.updateCombo(combo));
+  $effect(() => playfield.updateConstantDensity(constantDensity));
   $effect(() => playfield.updateCurrentJudgementIndex(currentJudgementIndex));
+  $effect(() => playfield.updateDensityMultiplier(densityMultiplier));
+  $effect(() => playfield.updateGoodWindow(goodWindow));
+  $effect(() => playfield.updateGreatWindow(greatWindow));
   $effect(() => playfield.updateJudgements(judgements));
   $effect(() => playfield.updateTime(time));
 

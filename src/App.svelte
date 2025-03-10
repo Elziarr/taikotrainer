@@ -19,6 +19,7 @@
   import { gameInput, type GameInput } from './lib/gameplay/input.svelte';
   import { HitCircleJudgement } from './lib/gameplay/judgements';
   import { Scorer } from './lib/gameplay/scorer.svelte';
+  import { GameplaySettings } from './lib/gameplay/settings/gameplay.svelte';
   import {
     loadAudioFile,
     loadChartMetadata,
@@ -55,6 +56,19 @@
   const autoplayer = new AutoPlayer({ ongameinput: applyGameInput });
 
   let showLoadingOverlay = $state(false);
+
+  $effect(() => {
+    autoplayer.active = GameplaySettings.autoplay;
+  });
+  $effect(() => {
+    timeline.speedMultiplier = GameplaySettings.speedMultiplier;
+    beatmapAudioPlayer.speedMultiplier = GameplaySettings.speedMultiplier;
+  });
+  $effect(() => {
+    judger.greatWindow = GameplaySettings.judgementWindows.great;
+    judger.goodWindow = GameplaySettings.judgementWindows.good;
+    judger.missWindow = GameplaySettings.judgementWindows.miss;
+  });
 
   function applyGameInput(input: GameInput) {
     judger.judgeInput(input);
@@ -129,8 +143,6 @@
       timeline.pause();
       beatmapAudioPlayer.pause();
     } else {
-      autoplayer.active = true;
-
       timeline.resume();
       beatmapAudioPlayer.resume();
     }
@@ -149,6 +161,8 @@
     judger.resetTo(nextTime);
     scorer.reset();
     playfield.resetJudgements();
+
+    GameplaySettings.reset();
   }
 </script>
 
@@ -167,9 +181,14 @@
     <Playfield
       bind:this={playfield}
       {chartObjects}
+      coloredJudgements={GameplaySettings.coloredJudgements}
       combo={scorer.combo}
+      constantDensity={GameplaySettings.constantDensity}
       currentJudgementIndex={judger.currentIndex}
+      densityMultiplier={GameplaySettings.densityMultiplier}
       judgements={judger.judgements}
+      goodWindow={GameplaySettings.judgementWindows.good}
+      greatWindow={GameplaySettings.judgementWindows.great}
       time={timeline.time}
     />
   </div>
@@ -188,9 +207,11 @@
     </div>
 
     <TimelineComponent
+      densityMultiplier={GameplaySettings.densityMultiplier}
+      duration={timeline.chartDuration}
       isPlaying={timeline.isPlaying}
       startTime={timeline.startTime}
-      duration={timeline.chartDuration}
+      speedMultiplier={GameplaySettings.speedMultiplier}
       time={timeline.time}
       onplaytoggle={handleTimelinePlayToggle}
       onrewind={() => timeline.rewind()}
@@ -222,7 +243,7 @@
 {/snippet}
 
 {#snippet gameplayTab()}
-  <GameplayTab />
+  <GameplayTab settings={GameplaySettings} />
 {/snippet}
 
 {#snippet audioTab()}

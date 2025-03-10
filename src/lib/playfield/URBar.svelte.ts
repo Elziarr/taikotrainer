@@ -1,8 +1,5 @@
 import { Container, Graphics, GraphicsContext, Ticker } from 'pixi.js';
 
-const GREAT_WINDOW = 25;
-const OK_WINDOW = 75;
-
 const AVG_INDICATOR_COLOR = 0xffffff;
 const AVG_INDICATOR_MARGIN = 15;
 const AVG_INDICATOR_HEIGHT = 20;
@@ -25,6 +22,8 @@ const JUDGEMENT_LINE_CTX = new GraphicsContext()
   });
 
 export class URBar extends Container {
+  private _goodWindow = 75;
+  private _greatWindow = 25;
   private _lastHitDelta = 0;
 
   private _okBar = new Graphics().rect(0, 0, 1, BAR_HEIGHT).fill(OK_BAR_COLOR);
@@ -70,7 +69,7 @@ export class URBar extends Container {
   }
 
   private _getXByDelta(dt: number) {
-    return BAR_WIDTH / 2 + (dt / OK_WINDOW) * (BAR_WIDTH / 2);
+    return BAR_WIDTH / 2 + (dt / this._goodWindow) * (BAR_WIDTH / 2);
   }
 
   private _loop = () => {
@@ -83,7 +82,7 @@ export class URBar extends Container {
 
   private _scaleBars() {
     this._okBar.width = BAR_WIDTH;
-    this._greatBar.width = (BAR_WIDTH * GREAT_WINDOW) / OK_WINDOW;
+    this._greatBar.width = (BAR_WIDTH * this._greatWindow) / this._goodWindow;
     this._greatBar.x = BAR_WIDTH / 2 - this._greatBar.width / 2;
   }
 
@@ -105,5 +104,15 @@ export class URBar extends Container {
   resetJudgements() {
     this._judgementLines.removeChildren();
     this._lastHitDelta = 0;
+  }
+
+  updateGoodWindow(newGoodWindow: number) {
+    this._goodWindow = newGoodWindow;
+    this._scaleBars();
+  }
+
+  updateGreatWindow(newGreatWindow: number) {
+    this._greatWindow = newGreatWindow;
+    this._scaleBars();
   }
 }

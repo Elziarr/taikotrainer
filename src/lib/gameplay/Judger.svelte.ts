@@ -16,10 +16,6 @@ interface JudgerParams {
 
 const BIG_HITCIRCLE_WINDOW = 30;
 
-const GREAT_WINDOW = 25;
-const OK_WINDOW = 75;
-const MISS_WINDOW = 108;
-
 export class Judger {
   private _chartObjects: ChartObjects | null = null;
   private _time = 0;
@@ -27,6 +23,10 @@ export class Judger {
   private _judgements: HitObjectJudgement[] = $state([]);
   private _currentIndex = $state(0);
   private _previousInputTime = 0;
+
+  private _greatWindow = 25;
+  private _goodWindow = 75;
+  private _missWindow = 108;
 
   private _onmiss: JudgerParams['onmiss'];
   private _ongood: JudgerParams['ongood'];
@@ -51,8 +51,44 @@ export class Judger {
     return this._currentIndex;
   }
 
+  get goodWindow() {
+    return this._goodWindow;
+  }
+
+  set goodWindow(v: number) {
+    if (v <= 0 || v <= this._greatWindow || v >= this._missWindow) {
+      throw new Error('Invalid judgement window value.');
+    }
+
+    this._goodWindow = v;
+  }
+
+  get greatWindow() {
+    return this._greatWindow;
+  }
+
+  set greatWindow(v: number) {
+    if (v <= 0 || v >= this._goodWindow || v >= this._missWindow) {
+      throw new Error('Invalid judgement window value.');
+    }
+
+    this._greatWindow = v;
+  }
+
   get judgements() {
     return this._judgements;
+  }
+
+  get missWindow() {
+    return this._missWindow;
+  }
+
+  set missWindow(v: number) {
+    if (v <= 0 || v <= this._greatWindow || v <= this._goodWindow) {
+      throw new Error('Invalid judgement window value.');
+    }
+
+    this._missWindow = v;
   }
 
   get time() {
@@ -117,8 +153,8 @@ export class Judger {
   private _judgeHitCircleByInput(ho: HitCircle, input: GameInput) {
     // Too early or too late to hit a hit circle:
     if (
-      input.time < ho.time - MISS_WINDOW ||
-      input.time > ho.time + OK_WINDOW
+      input.time < ho.time - this._missWindow ||
+      input.time > ho.time + this._goodWindow
     ) {
       return;
     }
@@ -151,13 +187,13 @@ export class Judger {
     record.hitDelta = timeDiff;
     record.input = input;
 
-    if (absTimeDiff < GREAT_WINDOW) {
+    if (absTimeDiff < this._greatWindow) {
       record.judgement = 'great';
       this._ongreat(timeDiff);
-    } else if (absTimeDiff < OK_WINDOW) {
+    } else if (absTimeDiff < this._goodWindow) {
       record.judgement = 'good';
       this._ongood(timeDiff);
-    } else if (absTimeDiff <= MISS_WINDOW) {
+    } else if (absTimeDiff <= this._missWindow) {
       record.judgement = 'early_miss';
       this._onmiss();
     }
@@ -189,7 +225,7 @@ export class Judger {
       return true;
     }
 
-    if (this._time <= ho.time + OK_WINDOW) {
+    if (this._time <= ho.time + this._goodWindow) {
       return true;
     }
 
@@ -289,7 +325,7 @@ export class Judger {
     // this._currentIndex = lo;
 
     for (const [i, ho] of this._chartObjects.hitObjects.entries()) {
-      if (this._time <= ho.time + OK_WINDOW) {
+      if (this._time <= ho.time + this._goodWindow) {
         this._currentIndex = i;
         break;
       }

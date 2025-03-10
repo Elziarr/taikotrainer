@@ -4,6 +4,8 @@ export class BeatmapAudioPlayer {
   private _audio = $state<Howl | null>(null);
   private _time = $state(0);
 
+  private _speedMultiplier = 1;
+
   get audio() {
     return this._audio;
   }
@@ -17,6 +19,15 @@ export class BeatmapAudioPlayer {
     return this._time;
   }
 
+  get speedMultiplier() {
+    return this._speedMultiplier;
+  }
+
+  set speedMultiplier(v: number) {
+    this._speedMultiplier = v;
+    this._audio?.rate(this._speedMultiplier);
+  }
+
   set time(v: number) {
     this._time = v;
 
@@ -24,6 +35,7 @@ export class BeatmapAudioPlayer {
       this._audio?.once('play', () => {
         this._audio?.seek(this._time / 1000);
       });
+      this._audio?.rate(this._speedMultiplier);
       this._audio?.play();
       this._boundToPlay = false;
     }

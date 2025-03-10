@@ -34,6 +34,9 @@ export class HitObjectsRenderer extends Container {
   private _hitObjectsByAppearTime: HitObject[] = [];
   private _latestStartIndex = 0;
 
+  private _constantDensity = false;
+  private _densityMultiplier = 1;
+
   /**
    * The width from the hit section to the rightmost edge of the playfield.
    */
@@ -89,7 +92,11 @@ export class HitObjectsRenderer extends Container {
       return 0;
     }
 
-    return BASE_WIDTH * this._chartObjects.getVelocityFactor(time);
+    return (
+      BASE_WIDTH *
+      this._chartObjects.getVelocityFactor(this._constantDensity ? 0 : time) *
+      this._densityMultiplier
+    );
   }
 
   private _render() {
@@ -243,14 +250,6 @@ export class HitObjectsRenderer extends Container {
     }
   }
 
-  setLeftMargin(leftMargin: number) {
-    this._leftMargin = leftMargin;
-  }
-
-  setPlayfieldHeight(height: number) {
-    this._playfieldHeight = height;
-  }
-
   updateChartObjects(newChartObjects: ChartObjects | null) {
     this._chartObjects = newChartObjects;
 
@@ -260,8 +259,30 @@ export class HitObjectsRenderer extends Container {
     this._render();
   }
 
+  updateConstantDensity(newConstantDensity: boolean) {
+    this._constantDensity = newConstantDensity;
+
+    this._hitObjectsByAppearTime = this._getSortedHitObjectsByAppearTime();
+    this._render();
+  }
+
+  updateDensityMultiplier(newDensityMultiplier: number) {
+    this._densityMultiplier = newDensityMultiplier;
+
+    this._hitObjectsByAppearTime = this._getSortedHitObjectsByAppearTime();
+    this._render();
+  }
+
   updateJudgements(newJudgements: HitObjectJudgement[]) {
     this._judgements = newJudgements;
+  }
+
+  setLeftMargin(leftMargin: number) {
+    this._leftMargin = leftMargin;
+  }
+
+  setPlayfieldHeight(height: number) {
+    this._playfieldHeight = height;
   }
 
   updateTime(newTime: number) {

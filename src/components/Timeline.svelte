@@ -10,6 +10,8 @@
   import MaterialSymbolsSpeedRounded from '~icons/material-symbols/speed-rounded';
 
   interface Props {
+    densityMultiplier: number;
+    speedMultiplier: number;
     isPlaying: boolean;
     startTime: number;
     duration: number;
@@ -23,6 +25,8 @@
   }
 
   let {
+    densityMultiplier,
+    speedMultiplier,
     isPlaying,
     startTime,
     duration,
@@ -84,10 +88,12 @@
 
   <div class="flex items-center gap-2">
     <p class="flex items-center gap-1">
-      <MaterialSymbolsSpeedRounded class="inline" /> 1.00
+      <MaterialSymbolsSpeedRounded class="inline" />
+      {speedMultiplier.toFixed(2)}
     </p>
     <p class="flex items-center gap-1">
-      <MaterialSymbolsExpandRounded class="inline rotate-90" /> 1.00
+      <MaterialSymbolsExpandRounded class="inline rotate-90" />
+      {densityMultiplier.toFixed(2)}
     </p>
   </div>
 </div>
