@@ -1,3 +1,4 @@
+import { AudioSettings } from './settings/audio.svelte';
 import { Howl } from 'howler';
 
 const bigDonSound = new Howl({
@@ -11,6 +12,14 @@ const kaSound = new Howl({
 });
 
 export class SfxPlayer {
+  constructor() {
+    $effect(() => {
+      bigDonSound?.volume(AudioSettings.sfxVolume);
+      donSound?.volume(AudioSettings.sfxVolume);
+      kaSound?.volume(AudioSettings.sfxVolume);
+    });
+  }
+
   playBigDon() {
     bigDonSound.play();
   }

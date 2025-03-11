@@ -1,3 +1,5 @@
+import { AudioSettings } from './settings/audio.svelte';
+
 export class BeatmapAudioPlayer {
   private _boundToPlay = false;
 
@@ -5,6 +7,12 @@ export class BeatmapAudioPlayer {
   private _time = $state(0);
 
   private _speedMultiplier = 1;
+
+  constructor() {
+    $effect(() => {
+      this._audio?.volume(AudioSettings.musicVolume);
+    });
+  }
 
   get audio() {
     return this._audio;
