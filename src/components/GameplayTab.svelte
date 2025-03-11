@@ -65,6 +65,25 @@
       bind:checked={settings.coloredJudgements}
     />
 
+    <label for="inputOffset">Input Offset (ms)</label>
+    <input
+      class="flex-1"
+      id="inputOffset"
+      type="number"
+      min="-25"
+      max="25"
+      step="1"
+      value={settings.offset}
+      onchange={e => {
+        const target = e.target as HTMLInputElement;
+        settings.offset = clamp(
+          Number(target.value),
+          parseFloat(target.min),
+          parseFloat(target.max),
+        );
+      }}
+    />
+
     <label for="greatWindow">Great Window (ms)</label>
     <input
       class="flex-1"

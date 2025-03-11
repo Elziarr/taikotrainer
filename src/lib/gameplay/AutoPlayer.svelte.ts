@@ -1,6 +1,7 @@
 import type { ChartObjects } from '../chart/ChartObjects';
 import { Balloon, Drumroll, HitCircle } from '../chart/hitobjects';
 import type { GameInput } from './input.svelte';
+import { GameplaySettings } from './settings/gameplay.svelte';
 
 interface AutoPlayerParams {
   ongameinput: (input: GameInput) => void;
@@ -87,12 +88,12 @@ export class AutoPlayer {
       if (ho instanceof HitCircle) {
         if (ho.isBig) {
           this._inputs.push({
-            time: ho.time,
+            time: ho.time + GameplaySettings.offset,
             type: ho.isKa ? 'left_ka' : 'left_don',
           });
 
           this._inputs.push({
-            time: ho.time,
+            time: ho.time + GameplaySettings.offset,
             type: ho.isKa ? 'right_ka' : 'right_don',
           });
 
@@ -101,14 +102,14 @@ export class AutoPlayer {
 
         if (ho.isKa) {
           this._inputs.push({
-            time: ho.time,
+            time: ho.time + GameplaySettings.offset,
             type: atLeftSide ? 'left_ka' : 'right_ka',
           });
 
           atLeftSide = !atLeftSide;
         } else {
           this._inputs.push({
-            time: ho.time,
+            time: ho.time + GameplaySettings.offset,
             type: atLeftSide ? 'left_don' : 'right_don',
           });
 
