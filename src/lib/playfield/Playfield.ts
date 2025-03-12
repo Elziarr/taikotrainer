@@ -4,6 +4,7 @@ import type { HitObjectJudgement } from '../gameplay/judgements';
 import { DrumAreaRenderer } from './DrumAreaRenderer';
 import { HitObjectsRenderer } from './HitObjectsRenderer';
 import { HitSectionRenderer } from './HitSectionRenderer';
+import { LineRenderer } from './LineRenderer';
 import { TrackRenderer } from './TrackRenderer';
 import { URBar } from './URBar.svelte';
 import { Assets, Container } from 'pixi.js';
@@ -18,6 +19,7 @@ export class Playfield extends Container {
   private _drumArea = new DrumAreaRenderer();
   private _hitObjects = new HitObjectsRenderer();
   private _hitSection = new HitSectionRenderer();
+  private _lines = new LineRenderer();
   private _track = new TrackRenderer();
   private _urBar = new URBar();
 
@@ -26,8 +28,8 @@ export class Playfield extends Container {
 
     this.addChild(
       this._track,
-      // this.lines,
       this._hitSection,
+      this._lines,
       this._hitObjects,
       this._drumArea,
       this._urBar,
@@ -44,6 +46,9 @@ export class Playfield extends Container {
       this._hitObjects.setLeftMargin(this._hitSection.x);
       this._hitObjects.setPlayfieldHeight(mainHeight);
       this._hitObjects.height = 100;
+
+      this._lines.setLeftMargin(this._hitSection.x);
+      this._lines.setPlayfieldHeight(mainHeight);
     }, 0);
   }
 
@@ -61,10 +66,11 @@ export class Playfield extends Container {
 
   updateChartObjects(newChartObjects: ChartObjects | null) {
     this._hitObjects.updateChartObjects(newChartObjects);
+    this._lines.updateChartObjects(newChartObjects);
   }
 
   updateCheckpointTime(newCheckpointTime: number | null) {
-    // TODO: line renderer
+    this._lines.updateCheckpointTime(newCheckpointTime);
   }
 
   updateColoredJudgements(newColoredJudgements: boolean) {
@@ -77,6 +83,7 @@ export class Playfield extends Container {
 
   updateConstantDensity(newConstantDensity: boolean) {
     this._hitObjects.updateConstantDensity(newConstantDensity);
+    this._lines.updateConstantDensity(newConstantDensity);
   }
 
   updateCurrentJudgementIndex(newCurrentJudgementIndex: number) {
@@ -85,6 +92,7 @@ export class Playfield extends Container {
 
   updateDensityMultiplier(newDensityMultiplier: number) {
     this._hitObjects.updateDensityMultiplier(newDensityMultiplier);
+    this._lines.updateDensityMultiplier(newDensityMultiplier);
   }
 
   updateGoodWindow(newGoodWindow: number) {
@@ -103,6 +111,7 @@ export class Playfield extends Container {
   updateTime(newTime: number) {
     this._hitObjects.updateTime(newTime);
     this._hitSection.updateTime(newTime);
+    this._lines.updateTime(newTime);
   }
 
   updateWidth(newWidth: number) {
@@ -112,5 +121,6 @@ export class Playfield extends Container {
 
     this._track.updateWidth(newWidth);
     this._hitObjects.updatePlayfieldWidth(newWidth);
+    this._lines.updatePlayfieldWidth(newWidth);
   }
 }
