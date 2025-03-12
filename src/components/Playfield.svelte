@@ -11,6 +11,7 @@
 
   interface Props {
     chartObjects: ChartObjects | null;
+    checkpointTime: number | null;
     coloredJudgements: boolean;
     combo: number;
     constantDensity: boolean;
@@ -24,6 +25,7 @@
 
   let {
     chartObjects,
+    checkpointTime,
     coloredJudgements,
     combo,
     constantDensity,
@@ -37,6 +39,7 @@
 
   const playfield = new Playfield();
   $effect(() => playfield.updateChartObjects(chartObjects));
+  $effect(() => playfield.updateCheckpointTime(checkpointTime));
   $effect(() => playfield.updateColoredJudgements(coloredJudgements));
   $effect(() => playfield.updateCombo(combo));
   $effect(() => playfield.updateConstantDensity(constantDensity));

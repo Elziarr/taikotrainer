@@ -63,6 +63,10 @@ export class Playfield extends Container {
     this._hitObjects.updateChartObjects(newChartObjects);
   }
 
+  updateCheckpointTime(newCheckpointTime: number | null) {
+    // TODO: line renderer
+  }
+
   updateColoredJudgements(newColoredJudgements: boolean) {
     this._hitSection.updateColoredJudgements(newColoredJudgements);
   }

@@ -2,6 +2,8 @@ import EventEmitter from 'eventemitter3';
 
 const DEFAULT_KEYBINDS = {
   autoplayToggle: 'a',
+  checkpointTimeClear: 'shift+p',
+  checkpointTimeSet: 'p',
   densityDown: '3',
   densityUp: '4',
   fineDensityDown: 'alt+3',
@@ -45,7 +47,7 @@ class _KeybindSettings {
     }
 
     const storedKeybinds = JSON.parse(storedKeybindsStr);
-    this._keybinds = storedKeybinds;
+    this._keybinds = { ...this._keybinds, ...storedKeybinds };
   }
 
   get keybinds() {

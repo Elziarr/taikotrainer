@@ -37,6 +37,7 @@
 
   let chartInfo: ChartInfoType | null = $state.raw(null);
   let chartObjects: ChartObjects | null = $state.raw(null);
+  let checkpointTime: number | null = $state(null);
 
   const timeline = new Timeline(handleTimelineTick, handleTimelineSeek);
   const beatmapAudioPlayer = new BeatmapAudioPlayer();
@@ -74,6 +75,11 @@
   handleKeybinds({
     onautoplaytoggle: () =>
       (GameplaySettings.autoplay = !GameplaySettings.autoplay),
+    oncheckpointtimeclear: () => (checkpointTime = null),
+    oncheckpointtimeset: () => {
+      console.log(123, timeline.time);
+      checkpointTime = timeline.time;
+    },
     ondensitydown: () =>
       (GameplaySettings.densityMultiplier = Math.max(
         0.1,
@@ -97,7 +103,8 @@
     onlongrewind: () => timeline.rewind(2.5),
     onplaybacktoggle: handleTimelinePlayToggle,
     onrestart: () => timeline.restart(),
-    onrestartfromprevious: () => {},
+    onrestartfromprevious: () =>
+      checkpointTime && timeline.seek(checkpointTime),
     onrewind: () => timeline.rewind(),
     onshortforward: () => timeline.forward(0.4),
     onshortrewind: () => timeline.rewind(0.4),
@@ -220,6 +227,7 @@
     <Playfield
       bind:this={playfield}
       {chartObjects}
+      {checkpointTime}
       coloredJudgements={GameplaySettings.coloredJudgements}
       combo={scorer.combo}
       constantDensity={GameplaySettings.constantDensity}
@@ -246,17 +254,20 @@
     </div>
 
     <TimelineComponent
+      {checkpointTime}
       densityMultiplier={GameplaySettings.densityMultiplier}
       duration={timeline.chartDuration}
       isPlaying={timeline.isPlaying}
       startTime={timeline.startTime}
       speedMultiplier={GameplaySettings.speedMultiplier}
       time={timeline.time}
+      oncheckpointtimeset={() => (checkpointTime = timeline.time)}
       onplaytoggle={handleTimelinePlayToggle}
       onrewind={() => timeline.rewind()}
       onforward={() => timeline.forward()}
       onrestart={() => timeline.restart()}
-      onrestartfromprevious={() => {}}
+      onrestartfromprevious={() =>
+        checkpointTime && timeline.seek(checkpointTime)}
       onseek={nextTime => timeline.seek(nextTime)}
     />
   </div>

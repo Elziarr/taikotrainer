@@ -8,34 +8,39 @@
   import MaterialSymbolsRestartAltRounded from '~icons/material-symbols/restart-alt-rounded';
   import MaterialSymbolsSkipPreviousRounded from '~icons/material-symbols/skip-previous-rounded';
   import MaterialSymbolsSpeedRounded from '~icons/material-symbols/speed-rounded';
+  import MynauiPinSolid from '~icons/mynaui/pin-solid';
 
   interface Props {
+    checkpointTime: number | null;
     densityMultiplier: number;
-    speedMultiplier: number;
-    isPlaying: boolean;
-    startTime: number;
     duration: number;
+    isPlaying: boolean;
+    speedMultiplier: number;
+    startTime: number;
     time: number;
-    onplaytoggle: () => void;
-    onrewind: () => void;
+    oncheckpointtimeset: () => void;
     onforward: () => void;
+    onplaytoggle: () => void;
     onrestart: () => void;
     onrestartfromprevious: () => void;
+    onrewind: () => void;
     onseek: (nextTime: number) => void;
   }
 
   let {
+    checkpointTime,
     densityMultiplier,
-    speedMultiplier,
-    isPlaying,
-    startTime,
     duration,
+    isPlaying,
+    speedMultiplier,
+    startTime,
     time,
-    onplaytoggle,
-    onrewind,
+    oncheckpointtimeset,
     onforward,
+    onplaytoggle,
     onrestart,
     onrestartfromprevious,
+    onrewind,
     onseek,
   }: Props = $props();
 
@@ -71,6 +76,12 @@
     <button class="button-timeline" onclick={onforward}>
       <MaterialSymbolsFastForwardRounded />
     </button>
+  </div>
+
+  <div class="flex gap-1">
+    <button class="button-timeline" onclick={oncheckpointtimeset}>
+      <MynauiPinSolid class="scale-90" />
+    </button>
     <button class="button-timeline" onclick={onrestartfromprevious}>
       <MaterialSymbolsRestartAltRounded />
     </button>
@@ -78,8 +89,9 @@
 
   <Scrubber
     class="flex-1 self-stretch"
-    {startTime}
+    {checkpointTime}
     endTime={startTime + duration}
+    {startTime}
     {time}
     {onseek}
   />

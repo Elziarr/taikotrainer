@@ -3,6 +3,8 @@ import hotkeys from 'hotkeys-js';
 
 interface KeybindProps {
   onautoplaytoggle: () => void;
+  oncheckpointtimeclear: () => void;
+  oncheckpointtimeset: () => void;
   ondensitydown: () => void;
   ondensityup: () => void;
   onfinedensitydown: () => void;
@@ -24,6 +26,8 @@ interface KeybindProps {
 
 export function handleKeybinds({
   onautoplaytoggle,
+  oncheckpointtimeclear,
+  oncheckpointtimeset,
   ondensitydown,
   ondensityup,
   onfinedensitydown,
@@ -44,6 +48,8 @@ export function handleKeybinds({
 }: KeybindProps) {
   // There may be a better way to type this out...
   bindKeybind('autoplayToggle', onautoplaytoggle);
+  bindKeybind('checkpointTimeClear', oncheckpointtimeclear);
+  bindKeybind('checkpointTimeSet', oncheckpointtimeset);
   bindKeybind('densityDown', ondensitydown);
   bindKeybind('densityUp', ondensityup);
   bindKeybind('fineDensityDown', onfinedensitydown);
