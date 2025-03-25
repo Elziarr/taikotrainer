@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ChartInfo } from '../lib/chart/metadata';
-  import { promptChartUpload, type ChartFiles } from '../lib/loader/uploading';
+  import { promptChartUpload, type ChartFiles } from '../lib/loading/uploading';
   import MaterialSymbolsUpload2Rounded from '~icons/material-symbols/upload-2-rounded';
 
   interface Props {

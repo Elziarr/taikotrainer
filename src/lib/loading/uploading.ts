@@ -1,4 +1,4 @@
-import { getFileExtension, readFolder } from '../files';
+import { getFileExtension, readFolder } from './file_util';
 
 const AUDIO_TYPES = ['mp3', 'ogg'];
 const MAP_TYPES = ['tja', 'osu'];

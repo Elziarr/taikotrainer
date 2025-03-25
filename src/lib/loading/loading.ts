@@ -1,5 +1,6 @@
 import type { ChartDiff } from '../chart/metadata';
-import { getFileExtension, readFileAsArrayBuffer } from '../files';
+import { decodeAudioFile } from './audio_decoding';
+import { getFileExtension, readFileAsArrayBuffer } from './file_util';
 import { loadOsuChartMetadata } from './osu_info';
 import { parseOsuChartObjects } from './osu_objects';
 import { loadTjaChartMetadata } from './tja_info';
@@ -33,14 +34,14 @@ export async function loadChartObjects(diff: ChartDiff) {
 
 export async function loadAudioFile(audioFile: File) {
   const readAudioFile = await readFileAsArrayBuffer(audioFile);
+  const audioBuffer = await decodeAudioFile(readAudioFile);
 
-  const arrayBufferView = new Uint8Array(readAudioFile.data);
-  const blob = new Blob([arrayBufferView], { type: readAudioFile.type });
-  const howlSource = URL.createObjectURL(blob);
+  const wavBlob = new Blob([audioBuffer], { type: 'audio/wav' });
+  const wavURL = URL.createObjectURL(wavBlob);
 
   return new Promise<Howl>(resolve => {
     const audio = new Howl({
-      src: [howlSource],
+      src: [wavURL],
       format: [readAudioFile.extension],
       onload: () => resolve(audio),
     });

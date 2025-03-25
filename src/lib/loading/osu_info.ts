@@ -3,7 +3,7 @@ import {
   type ChartDiff,
   type ChartInfo,
 } from '../chart/metadata';
-import { readFileAsArrayBuffer } from '../files';
+import { readFileAsArrayBuffer } from './file_util';
 import type { ChartFiles } from './uploading';
 import { BeatmapDecoder } from 'osu-parsers';
 // @ts-expect-error Complains about no index.d.ts even though there is one...

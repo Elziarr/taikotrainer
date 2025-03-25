@@ -1,7 +1,7 @@
 export const MIN_MULTIPLIER_VALUE = 0.05;
 
 class _GameplaySettings {
-  autoplay = $state(true);
+  autoplay = $state(false);
   coloredJudgements = $state(false);
   constantDensity = $state(false);
   densityMultiplier = $state(1.0);
@@ -14,7 +14,7 @@ class _GameplaySettings {
   speedMultiplier = $state(1.0);
 
   reset() {
-    this.autoplay = true;
+    this.autoplay = false;
     this.coloredJudgements = false;
     this.constantDensity = false;
     this.densityMultiplier = 1.0;

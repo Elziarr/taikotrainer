@@ -2,7 +2,7 @@ import { ChartObjects } from '../chart/ChartObjects';
 import { DifficultyEvent, KiaiTimeEvent, TimingEvent } from '../chart/events';
 import { Balloon, Drumroll, HitCircle } from '../chart/hitobjects';
 import type { ChartDiff } from '../chart/metadata';
-import { readFileAsArrayBuffer } from '../files';
+import { readFileAsArrayBuffer } from './file_util';
 import {
   BeatmapDecoder,
   HittableObject,

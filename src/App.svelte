@@ -11,11 +11,10 @@
   import Title from './components/Title.svelte';
   import type { ChartObjects } from './lib/chart/ChartObjects';
   import type { ChartInfo as ChartInfoType } from './lib/chart/metadata';
+  import { Timeline } from './lib/gameplay/AudioTimeline.svelte';
   import { AutoPlayer } from './lib/gameplay/AutoPlayer.svelte';
-  import { BeatmapAudioPlayer } from './lib/gameplay/BeatmapAudioPlayer.svelte';
   import { Judger } from './lib/gameplay/Judger.svelte';
   import { SfxPlayer } from './lib/gameplay/SfxPlayer.svelte';
-  import { Timeline } from './lib/gameplay/Timeline.svelte';
   import { gameInput, type GameInput } from './lib/gameplay/input.svelte';
   import { HitCircleJudgement } from './lib/gameplay/judgements';
   import { handleKeybinds } from './lib/gameplay/keybinds';
@@ -25,8 +24,8 @@
     loadAudioFile,
     loadChartMetadata,
     loadChartObjects,
-  } from './lib/loader/loading';
-  import type { ChartFiles } from './lib/loader/uploading';
+  } from './lib/loading/loading';
+  import type { ChartFiles } from './lib/loading/uploading';
   import MdiFile from '~icons/mdi/file';
   import MdiKeyboard from '~icons/mdi/keyboard';
   import MingcuteSettings2Fill from '~icons/mingcute/settings-2-fill';
@@ -39,8 +38,10 @@
   let chartObjects: ChartObjects | null = $state.raw(null);
   let checkpointTime: number | null = $state(null);
 
-  const timeline = new Timeline(handleTimelineTick, handleTimelineSeek);
-  const beatmapAudioPlayer = new BeatmapAudioPlayer();
+  const timeline = new Timeline({
+    onseek: handleTimelineSeek,
+    ontick: handleTimelineTick,
+  });
   const sfxPlayer = new SfxPlayer();
 
   const judger = new Judger({
@@ -64,7 +65,6 @@
   });
   $effect(() => {
     timeline.speedMultiplier = GameplaySettings.speedMultiplier;
-    beatmapAudioPlayer.speedMultiplier = GameplaySettings.speedMultiplier;
   });
   $effect(() => {
     judger.greatWindow = GameplaySettings.judgementWindows.great;
@@ -77,7 +77,6 @@
       (GameplaySettings.autoplay = !GameplaySettings.autoplay),
     oncheckpointtimeclear: () => (checkpointTime = null),
     oncheckpointtimeset: () => {
-      console.log(123, timeline.time);
       checkpointTime = timeline.time;
     },
     ondensitydown: () =>
@@ -162,14 +161,10 @@
 
     // TODO: Don't load the same audio twice (especially when simply diff changing)
     const chartAudio = await loadAudioFile(chartInfo!.audioFile);
-    beatmapAudioPlayer.audio = chartAudio;
-
     chartObjects = await loadChartObjects(chartInfo!.diffs[index]);
 
-    timeline.chartObjects = chartObjects;
-    timeline.chartDuration =
-      chartObjects?.getDuration(beatmapAudioPlayer.audio!.duration() * 1000) ??
-      0;
+    timeline.setChart(chartObjects, chartAudio);
+
     judger.chartObjects = chartObjects;
     autoplayer.chartObjects = chartObjects;
 
@@ -187,21 +182,17 @@
   function handleTimelinePlayToggle() {
     if (timeline.isPlaying) {
       timeline.pause();
-      beatmapAudioPlayer.pause();
     } else {
       timeline.resume();
-      beatmapAudioPlayer.resume();
     }
   }
 
   function handleTimelineTick(currTime: number) {
-    beatmapAudioPlayer.time = currTime;
     judger.time = currTime;
     autoplayer.time = currTime;
   }
 
   function handleTimelineSeek(nextTime: number) {
-    beatmapAudioPlayer.seek(nextTime);
     autoplayer.seek(nextTime);
 
     judger.resetTo(nextTime);
@@ -256,7 +247,7 @@
     <TimelineComponent
       {checkpointTime}
       densityMultiplier={GameplaySettings.densityMultiplier}
-      duration={timeline.chartDuration}
+      duration={timeline.duration}
       isPlaying={timeline.isPlaying}
       startTime={timeline.startTime}
       speedMultiplier={GameplaySettings.speedMultiplier}
@@ -279,7 +270,7 @@
 
 <svelte:window
   use:gameInput={{
-    getStartTimestamp: () => timeline.startTimestamp,
+    getStartTimestamp: () => timeline.startTimestamp || 0,
     ongameinput: handleGameInput,
   }}
 />

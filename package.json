@@ -40,9 +40,12 @@
     "vite": "^6.1.0"
   },
   "dependencies": {
+    "@wasm-audio-decoders/ogg-vorbis": "^0.1.16",
     "eventemitter3": "^5.0.1",
     "hotkeys-js": "^3.13.9",
     "howler": "^2.2.4",
+    "mpg123-decoder": "^1.0.0",
+    "ogg-opus-decoder": "^1.6.14",
     "osu-parsers": "^4.1.7",
     "osu-taiko-stable": "^5.0.0",
     "pixi.js": "^8.8.0",
