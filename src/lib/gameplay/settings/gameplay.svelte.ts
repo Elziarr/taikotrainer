@@ -73,14 +73,6 @@ class _GameplaySettings {
       }),
     );
   }
-
-  reset() {
-    this.autoplay = false;
-    this.coloredJudgements = false;
-    this.constantDensity = false;
-    this.densityMultiplier = 1.0;
-    this.speedMultiplier = 1.0;
-  }
 }
 
 export type GameplaySettings = _GameplaySettings;

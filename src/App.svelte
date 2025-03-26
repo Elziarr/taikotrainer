@@ -152,6 +152,9 @@
       return;
     }
 
+    GameplaySettings.speedMultiplier = 1.0;
+    GameplaySettings.densityMultiplier = 1.0;
+
     chartInfo = nextChartInfo;
     showLoadingOverlay = false;
   }
@@ -198,8 +201,6 @@
     judger.resetTo(nextTime);
     scorer.reset();
     playfield.resetJudgements();
-
-    GameplaySettings.reset();
   }
 </script>
 
