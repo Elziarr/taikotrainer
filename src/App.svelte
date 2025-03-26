@@ -46,11 +46,11 @@
 
   const judger = new Judger({
     ongreat: dt => {
-      scorer.scoreGreat();
+      scorer.scoreGreat(dt);
       playfield.displayHitDelta(dt);
     },
     ongood: dt => {
-      scorer.scoreGood();
+      scorer.scoreGood(dt);
       playfield.displayHitDelta(dt);
     },
     onmiss: () => scorer.scoreMiss(),
@@ -67,9 +67,9 @@
     timeline.speedMultiplier = GameplaySettings.speedMultiplier;
   });
   $effect(() => {
-    judger.greatWindow = GameplaySettings.judgementWindows.great;
-    judger.goodWindow = GameplaySettings.judgementWindows.good;
-    judger.missWindow = GameplaySettings.judgementWindows.miss;
+    judger.greatWindow = GameplaySettings.greatWindow;
+    judger.goodWindow = GameplaySettings.goodWindow;
+    judger.missWindow = GameplaySettings.missWindow;
   });
 
   handleKeybinds({
@@ -225,8 +225,8 @@
       currentJudgementIndex={judger.currentIndex}
       densityMultiplier={GameplaySettings.densityMultiplier}
       judgements={judger.judgements}
-      goodWindow={GameplaySettings.judgementWindows.good}
-      greatWindow={GameplaySettings.judgementWindows.great}
+      goodWindow={GameplaySettings.goodWindow}
+      greatWindow={GameplaySettings.greatWindow}
       time={timeline.time}
     />
   </div>

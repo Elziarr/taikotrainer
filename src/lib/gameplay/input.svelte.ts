@@ -1,4 +1,3 @@
-import { GameplaySettings } from './settings/gameplay.svelte';
 import { KeybindSettings } from './settings/keybinds.svelte';
 
 export type GameInputType = 'left_ka' | 'left_don' | 'right_don' | 'right_ka';
@@ -24,12 +23,7 @@ export function gameInput(
   let rightKaDown = false;
 
   function getInputTime(evtTimestamp: number) {
-    return (
-      evtTimestamp -
-      getStartTimestamp() +
-      // Howler.ctx.baseLatency +
-      GameplaySettings.offset
-    );
+    return evtTimestamp - getStartTimestamp();
   }
 
   function handleKeydown(e: KeyboardEvent) {

@@ -1,6 +1,7 @@
 import type { ChartObjects } from '../chart/ChartObjects';
 import { Clock } from './Clock.svelte';
 import { AudioSettings } from './settings/audio.svelte';
+import { GameplaySettings } from './settings/gameplay.svelte';
 
 interface TimelineProps {
   onseek: (time: number) => void;
@@ -21,6 +22,10 @@ export class Timeline {
 
   private _onseek: TimelineProps['onseek'];
   private _ontick: TimelineProps['ontick'];
+
+  private _startOffset = $derived(
+    -Howler.ctx.baseLatency * 1000 + GameplaySettings.offset,
+  );
 
   constructor({ onseek, ontick }: TimelineProps) {
     this._clock = new Clock({ ontick: this._tick });
@@ -87,8 +92,14 @@ export class Timeline {
     this._startTimestamp = timestamp - this._time;
 
     // Time audio playback
-    if (this._time >= -14 && this._audio && this._boundToPlayAudio) {
-      this._audio?.once('play', () => this._audio?.seek(this._time / 1000));
+    if (
+      this._time >= this._startOffset &&
+      this._audio &&
+      this._boundToPlayAudio
+    ) {
+      this._audio?.once('play', () =>
+        this._audio?.seek((this._time - this._startOffset) / 1000),
+      );
       this._audio?.rate(this._speedMultiplier);
       this._audio?.play();
 
@@ -142,7 +153,7 @@ export class Timeline {
 
   seek(time: number) {
     this._time = time;
-    this._audio?.seek(this._time / 1000);
+    this._audio?.seek((this._time - this._startOffset) / 1000);
 
     if (this._time < 0) {
       this._audio?.stop();
@@ -161,9 +172,6 @@ export class Timeline {
     const startOffsetLength =
       this._chartObjects.timingEvents[0].measureLength || 0;
     this._startTime = -startOffsetLength;
-    // this._chartObjects.hitObjects[0].time < startOffsetLength
-    // ? -startOffsetLength
-    // : 0;
 
     this._duration = Math.min(
       this._chartObjects.hitObjects.at(-1)!.time + startOffsetLength,

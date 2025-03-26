@@ -17,7 +17,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <SettingGroup heading="Difficulty">
+  <SettingGroup heading="Gameplay Settings">
     <label for="speedMultipler">Speed Multiplier</label>
     <input
       class="flex-1"
@@ -46,6 +46,9 @@
       }}
     />
 
+    <label for="autoplay">Autoplay</label>
+    <input id="autoplay" type="checkbox" bind:checked={settings.autoplay} />
+
     <label for="constantDensity">Constant Density</label>
     <input
       id="constantDensity"
@@ -53,25 +56,22 @@
       bind:checked={settings.constantDensity}
     />
 
-    <label for="autoplay">Autoplay</label>
-    <input id="autoplay" type="checkbox" bind:checked={settings.autoplay} />
-  </SettingGroup>
-
-  <SettingGroup heading="Timing">
     <label for="coloredJudgements">Colored Judgements</label>
     <input
       id="coloredJudgements"
       type="checkbox"
       bind:checked={settings.coloredJudgements}
     />
+  </SettingGroup>
 
-    <label for="inputOffset">Input Offset (ms)</label>
+  <SettingGroup heading="Global Settings">
+    <label for="inputOffset">Offset (ms)</label>
     <input
       class="flex-1"
       id="inputOffset"
       type="number"
-      min="-25"
-      max="25"
+      min="-20"
+      max="20"
       step="1"
       value={settings.offset}
       onchange={e => {
@@ -90,12 +90,12 @@
       id="greatWindow"
       type="number"
       min="1"
-      max={settings.judgementWindows.good - 1}
+      max={settings.goodWindow - 1}
       step="0.1"
-      value={settings.judgementWindows.great}
+      value={settings.greatWindow}
       onchange={e => {
         const target = e.target as HTMLInputElement;
-        settings.judgementWindows.great = clamp(
+        settings.greatWindow = clamp(
           Number(target.value),
           parseFloat(target.min),
           parseFloat(target.max),
@@ -109,12 +109,12 @@
       id="goodWindow"
       type="number"
       step="0.1"
-      min={settings.judgementWindows.great + 1}
-      max={settings.judgementWindows.miss - 1}
-      value={settings.judgementWindows.good}
+      min={settings.greatWindow + 1}
+      max={settings.missWindow - 1}
+      value={settings.goodWindow}
       onchange={e => {
         const target = e.target as HTMLInputElement;
-        settings.judgementWindows.good = clamp(
+        settings.goodWindow = clamp(
           Number(target.value),
           parseFloat(target.min),
           parseFloat(target.max),
@@ -127,12 +127,12 @@
       class="flex-1"
       id="missWindow"
       type="number"
-      min={settings.judgementWindows.good + 1}
+      min={settings.goodWindow + 1}
       step="0.1"
-      value={settings.judgementWindows.miss}
+      value={settings.missWindow}
       onchange={e => {
         const target = e.target as HTMLInputElement;
-        settings.judgementWindows.miss = clamp(
+        settings.missWindow = clamp(
           Number(target.value),
           parseFloat(target.min),
           parseFloat(target.max),
