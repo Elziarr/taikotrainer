@@ -116,6 +116,8 @@
   });
 
   function applyGameInput(input: GameInput) {
+    judger.bypassTimeJudgements = false;
+
     judger.judgeInput(input);
     playfield.displayDrumInput(input.type);
 
@@ -201,6 +203,10 @@
     judger.resetTo(nextTime);
     scorer.reset();
     playfield.resetJudgements();
+
+    if (timeline.time !== timeline.startTime) {
+      judger.bypassTimeJudgements = true;
+    }
   }
 </script>
 

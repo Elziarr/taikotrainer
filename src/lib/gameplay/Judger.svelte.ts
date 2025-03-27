@@ -32,6 +32,8 @@ export class Judger {
   private _ongood: JudgerParams['ongood'];
   private _ongreat: JudgerParams['ongreat'];
 
+  bypassTimeJudgements = false;
+
   constructor(params: JudgerParams) {
     this._onmiss = params.onmiss;
     this._ongood = params.ongood;
@@ -167,6 +169,11 @@ export class Judger {
       return;
     }
 
+    if (this.bypassTimeJudgements) {
+      this._currentIndex += 1;
+      return;
+    }
+
     const record = this._judgements[this._currentIndex] as HitCircleJudgement;
 
     // Handle the 2nd input for big hit circles.
@@ -232,7 +239,7 @@ export class Judger {
     // Don't judge already previously judged hit circles; this handles big hit
     // circles which do not increment currentIndex directly on the initial
     // input.
-    if (record.judgement === null) {
+    if (!this.bypassTimeJudgements && record.judgement === null) {
       record.judgement = 'late_miss';
       this._onmiss();
     }
