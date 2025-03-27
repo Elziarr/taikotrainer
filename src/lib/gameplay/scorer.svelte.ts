@@ -9,7 +9,7 @@ export class Scorer {
 
   private _accuracy = $derived(
     this._totalHits === 0
-      ? 100
+      ? 0
       : ((this._totalGreat + 0.5 * this._totalGood) / this._totalHits) * 100,
   );
   private _unstableRate = $derived(Math.sqrt(this._hitVariance) * 10);
