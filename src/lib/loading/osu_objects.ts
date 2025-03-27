@@ -101,13 +101,36 @@ function getHitObjects(beatmap: DecodedBeatmap) {
 }
 
 function getKiaiTimeEvents(beatmap: DecodedBeatmap) {
-  return beatmap.controlPoints.effectPoints.reduce((evts, ep) => {
-    if (evts.length > 0 && evts.at(-1)!.kiai === ep.kiai) {
-      return evts;
+  const kiaiTimeEvents = [];
+
+  for (let i = 0; i < beatmap.controlPoints.effectPoints.length; i++) {
+    const evt = beatmap.controlPoints.effectPoints[i];
+
+    if (!evt.kiai) {
+      continue;
     }
 
-    return evts.concat(new KiaiTimeEvent(ep.startTime, ep.kiai));
-  }, [] as KiaiTimeEvent[]);
+    let kiaiEndTime = Infinity;
+
+    i += 1;
+    while (i < beatmap.controlPoints.effectPoints.length) {
+      const nextKiai = beatmap.controlPoints.effectPoints[i];
+
+      if (!nextKiai || nextKiai.kiai) {
+        i += 1;
+        continue;
+      }
+
+      kiaiEndTime = nextKiai.startTime;
+      break;
+    }
+
+    kiaiTimeEvents.push(
+      new KiaiTimeEvent(evt.startTime, kiaiEndTime - evt.startTime),
+    );
+  }
+
+  return kiaiTimeEvents;
 }
 
 function getTimingEvents(beatmap: DecodedBeatmap) {

@@ -1,11 +1,12 @@
 <script lang="ts">
+  import type { KiaiTimeEvent } from '../lib/chart/events';
   import type { ClassValue } from 'svelte/elements';
 
   interface Props {
     class?: ClassValue;
     checkpointTime: number | null;
     endTime?: number;
-    kiaiTimes?: { start: number; end: number }[];
+    kiaiTimes?: KiaiTimeEvent[];
     startTime?: number;
     time: number;
     onseek: (nextTime: number) => void;
@@ -20,6 +21,10 @@
     time,
     onseek,
   }: Props = $props();
+
+  function getKiaiWidth(duration: number) {
+    return (duration / (endTime - startTime)) * 100;
+  }
 
   function getLeftStyle(timeVal: number) {
     return ((timeVal - startTime) / (endTime - startTime)) * 100;
@@ -36,12 +41,12 @@
     oninput={e => onseek(parseFloat((e.target! as HTMLInputElement).value))}
   />
 
-  <!-- {#each kiaiTimes as { start, end }}
+  {#each kiaiTimes as { time, duration }}
     <span
-      class="pointer-events-none absolute block h-50/100 w-32 bg-yellow-200/80"
-      style="left: {getLeftStyle(start)}%;"
+      class="pointer-events-none absolute block h-50/100 rounded-sm bg-yellow-200/80"
+      style="left: {getLeftStyle(time)}%; width: {getKiaiWidth(duration)}%;"
     ></span>
-  {/each} -->
+  {/each}
 
   <span class="absolute inset-0 mx-[5px] flex items-center">
     {#if checkpointTime !== null}

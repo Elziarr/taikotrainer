@@ -50,13 +50,14 @@ function getBeatmapInfo(beatmap: Song, chosenCourse: Course) {
   const timingEvents: TimingEvent[] = [
     new TimingEvent(offset, 60000 / beatmap.bpm, 4),
   ];
-  const kiaiTimeEvents: KiaiTimeEvent[] = [new KiaiTimeEvent(0, false)];
+  const kiaiTimeEvents: KiaiTimeEvent[] = [];
 
   let currBpm = beatmap.bpm;
   let currTimeSigTop = 4;
   let currTimeSigBottom = 4;
   let currTime = offset;
 
+  let lastKiaiStartTime = 0;
   let currSequence: Note[] = [];
   let currTimedCommands: (Command[] | null)[] = [];
 
@@ -82,11 +83,11 @@ function getBeatmapInfo(beatmap: Song, chosenCourse: Course) {
         break;
 
       case CommandType.GoGoStart:
-        // TODO: Implement kiai time parsing for tja
+        handleGogoStart();
         break;
 
       case CommandType.GoGoEnd:
-        // TODO: Implement kiai time parsing for tja
+        handleGogoEnd();
         break;
 
       // Handle commands that can be applied in the middle of a sequence:
@@ -119,6 +120,16 @@ function getBeatmapInfo(beatmap: Song, chosenCourse: Course) {
     passthroughNotes =
       cmd instanceof NormalBranchMarkerCommand ||
       cmd instanceof AdvancedBranchMarkerCommand;
+  }
+
+  function handleGogoEnd() {
+    kiaiTimeEvents.push(
+      new KiaiTimeEvent(lastKiaiStartTime, currTime - lastKiaiStartTime),
+    );
+  }
+
+  function handleGogoStart() {
+    lastKiaiStartTime = currTime;
   }
 
   function handleMeasure(cmd: MeasureCommand) {

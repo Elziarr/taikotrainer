@@ -17,12 +17,12 @@ export class DifficultyEvent extends BeatmapEvent {
 }
 
 export class KiaiTimeEvent extends BeatmapEvent {
-  kiai: boolean;
+  duration: number;
 
-  constructor(time: number, kiai: boolean) {
+  constructor(time: number, duration: number) {
     super(time);
 
-    this.kiai = kiai;
+    this.duration = duration;
   }
 }
 

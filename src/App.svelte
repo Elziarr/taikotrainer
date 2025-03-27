@@ -256,6 +256,7 @@
       densityMultiplier={GameplaySettings.densityMultiplier}
       duration={timeline.duration}
       isPlaying={timeline.isPlaying}
+      kiaiTimes={chartObjects?.kiaiTimeEvents ?? []}
       startTime={timeline.startTime}
       speedMultiplier={GameplaySettings.speedMultiplier}
       time={timeline.time}

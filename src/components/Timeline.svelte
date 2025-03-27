@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { KiaiTimeEvent } from '../lib/chart/events';
   import Scrubber from './Scrubber.svelte';
   import MaterialSymbolsExpandRounded from '~icons/material-symbols/expand-rounded';
   import MaterialSymbolsFastForwardRounded from '~icons/material-symbols/fast-forward-rounded';
@@ -15,6 +16,7 @@
     densityMultiplier: number;
     duration: number;
     isPlaying: boolean;
+    kiaiTimes: KiaiTimeEvent[];
     speedMultiplier: number;
     startTime: number;
     time: number;
@@ -32,6 +34,7 @@
     densityMultiplier,
     duration,
     isPlaying,
+    kiaiTimes,
     speedMultiplier,
     startTime,
     time,
@@ -91,6 +94,7 @@
     class="flex-1 self-stretch"
     {checkpointTime}
     endTime={startTime + duration}
+    {kiaiTimes}
     {startTime}
     {time}
     {onseek}
