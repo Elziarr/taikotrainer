@@ -93,7 +93,7 @@
   <Scrubber
     class="flex-1 self-stretch"
     {checkpointTime}
-    endTime={startTime + duration}
+    endTime={duration}
     {kiaiTimes}
     {startTime}
     {time}
