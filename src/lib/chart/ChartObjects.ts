@@ -37,12 +37,11 @@ export class ChartObjects {
       return 0;
     }
 
-    for (let i = 1; i < events.length; i++) {
+    for (let i = events.length - 1; i >= 0; i--) {
       const currObj = events[i];
-      const prevObj = events[i - 1];
 
-      if (time >= prevObj.time && time < currObj.time) {
-        return i - 1;
+      if (time >= currObj.time) {
+        return i;
       }
     }
 

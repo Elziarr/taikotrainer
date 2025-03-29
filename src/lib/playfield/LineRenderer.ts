@@ -29,14 +29,13 @@ export class LineRenderer extends Container {
   private _getEarliestMeasureLineTime(timingEvtIndex: number) {
     const timingEvt = this._chartObjects!.timingEvents[timingEvtIndex];
 
-    const priorMeasureLineTime =
-      nearestPriorMultiple(
-        timingEvt.measureLength,
-        timingEvt.time,
-        this._time,
-      ) - timingEvt.measureLength;
+    const priorMeasureLineTime = nearestPriorMultiple(
+      timingEvt.measureLength,
+      timingEvt.time,
+      this._time,
+    );
 
-    return Math.round(Math.max(priorMeasureLineTime, timingEvt.time) * 1000);
+    return Math.max(priorMeasureLineTime, timingEvt.time);
   }
 
   private _getVelocity(time: number) {
@@ -76,29 +75,22 @@ export class LineRenderer extends Container {
 
     let currLineTime = startLineTime;
 
-    while (true) {
-      if (
-        nextTimingEvt &&
-        currLineTime > Math.round(nextTimingEvt.time * 1000)
-      ) {
+    while (
+      currLineTime - startLineTime <
+      currTimingEvt.measureLength * currTimingEvt.beatsPerMeasure
+    ) {
+      const roundedTime = Math.floor(currLineTime);
+
+      if (nextTimingEvt && roundedTime >= Math.floor(nextTimingEvt.time)) {
         break;
       }
-
-      const currVel = this._getVelocity(currTimingEvt.time);
-      const linePos =
-        currVel * (currLineTime / 1000 - this._time) + this._leftMargin;
 
       yield {
-        time: currLineTime / 1000,
-        velocity: this._getVelocity(currLineTime / 1000),
+        time: roundedTime,
+        velocity: this._getVelocity(currLineTime),
       };
 
-      if (linePos > this._playfieldWidth) {
-        break;
-      }
-
-      currLineTime =
-        currLineTime + Math.round(currTimingEvt.measureLength * 1000);
+      currLineTime += currTimingEvt.measureLength;
     }
   }
 
@@ -180,6 +172,8 @@ export class LineRenderer extends Container {
   updateChartObjects(newChartObjects: ChartObjects | null) {
     this._chartObjects = newChartObjects;
     this._render();
+
+    console.log(newChartObjects);
   }
 
   updateCheckpointTime(newCheckpointTime: number | null) {
@@ -204,6 +198,7 @@ export class LineRenderer extends Container {
 
   updatePlayfieldWidth(newWidth: number) {
     this._playfieldWidth = newWidth;
+    this._render();
   }
 }
 

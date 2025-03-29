@@ -108,7 +108,7 @@ function getBeatmapInfo(beatmap: Song, chosenCourse: Course) {
     // lengths somehow.
     timingEvents.push(
       new TimingEvent(
-        Math.round(currTime * 1000) / 1000,
+        currTime,
         (60000 / currBpm) * (currTimeSigBottom / currTimeSigTop),
         currTimeSigTop,
       ),
