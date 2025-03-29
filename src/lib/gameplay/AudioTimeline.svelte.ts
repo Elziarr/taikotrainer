@@ -1,4 +1,5 @@
 import type { ChartObjects } from '../chart/ChartObjects';
+import { Drumroll, Balloon } from '../chart/hitobjects';
 import { Clock } from './Clock.svelte';
 import { AudioSettings } from './settings/audio.svelte';
 import { GameplaySettings } from './settings/gameplay.svelte';
@@ -173,8 +174,14 @@ export class Timeline {
       this._chartObjects.timingEvents[0].measureLength || 0;
     this._startTime = -startOffsetLength;
 
+    const lastHitObject = this._chartObjects.hitObjects.at(-1)!;
+    const lastHitTime =
+      lastHitObject instanceof Balloon || lastHitObject instanceof Drumroll
+        ? lastHitObject.endTime
+        : lastHitObject.time;
+
     this._duration = Math.min(
-      this._chartObjects.hitObjects.at(-1)!.time + startOffsetLength,
+      lastHitTime + startOffsetLength,
       this._audio.duration() * 1000,
     );
 
