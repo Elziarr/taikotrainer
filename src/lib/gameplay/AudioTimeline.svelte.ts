@@ -9,8 +9,10 @@ interface TimelineProps {
   ontick: (time: number) => void;
 }
 
+const SMOOTH_SEEK_DURATION = 150;
+
 export class Timeline {
-  private _clock: Clock;
+  private clock: Clock;
 
   private _audio: Howl | null = $state(null);
   private _boundToPlayAudio = false;
@@ -29,7 +31,7 @@ export class Timeline {
   );
 
   constructor({ onseek, ontick }: TimelineProps) {
-    this._clock = new Clock({ ontick: this._tick });
+    this.clock = new Clock({ ontick: this._tick });
 
     this._onseek = onseek;
     this._ontick = ontick;
@@ -64,7 +66,7 @@ export class Timeline {
   }
 
   get isPlaying() {
-    return this._clock.isRunning;
+    return this.clock.isRunning;
   }
 
   get speedMultiplier() {
@@ -86,6 +88,31 @@ export class Timeline {
 
   get time() {
     return this._time;
+  }
+
+  /**
+   * Assumes paused audio.
+   * @param time
+   */
+  private _smoothSeek(time: number) {
+    const vel = (time - this._time) / SMOOTH_SEEK_DURATION;
+
+    const lerpClock = new Clock({
+      ontick: (timestamp: DOMHighResTimeStamp, dt: DOMHighResTimeStamp) => {
+        this._time =
+          vel > 0
+            ? Math.min(this._time + vel * dt, time)
+            : Math.max(this._time + vel * dt, time);
+
+        if (this._time === time) {
+          lerpClock.pause();
+        }
+
+        this._onseek(this._time);
+      },
+    });
+
+    lerpClock.resume();
   }
 
   private _tick = (timestamp: DOMHighResTimeStamp, dt: DOMHighResTimeStamp) => {
@@ -121,11 +148,16 @@ export class Timeline {
       this._duration,
       this._time + this._currentMeasureLength * factor,
     );
-    this.seek(nextTime);
+
+    if (!this.isPlaying) {
+      this._smoothSeek(nextTime);
+    } else {
+      this.seek(nextTime);
+    }
   }
 
   pause() {
-    this._clock.pause();
+    this.clock.pause();
     this._audio?.pause();
 
     this._startTimestamp = null;
@@ -136,11 +168,11 @@ export class Timeline {
   }
 
   resume() {
-    if (!this._clock.isRunning && this._time >= this._duration) {
+    if (!this.clock.isRunning && this._time >= this._duration) {
       this.restart();
     }
 
-    this._clock.resume();
+    this.clock.resume();
     this._boundToPlayAudio = true;
   }
 
@@ -149,7 +181,12 @@ export class Timeline {
       this._startTime,
       this._time - this._currentMeasureLength * factor,
     );
-    this.seek(nextTime);
+
+    if (!this.isPlaying) {
+      this._smoothSeek(nextTime);
+    } else {
+      this.seek(nextTime);
+    }
   }
 
   seek(time: number) {
