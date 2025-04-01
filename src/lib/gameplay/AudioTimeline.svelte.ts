@@ -9,10 +9,9 @@ interface TimelineProps {
   ontick: (time: number) => void;
 }
 
-const SMOOTH_SEEK_DURATION = 150;
-
 export class Timeline {
-  private clock: Clock;
+  private _lerpClock: Clock;
+  private _mainClock: Clock;
 
   private _audio: Howl | null = $state(null);
   private _boundToPlayAudio = false;
@@ -22,6 +21,7 @@ export class Timeline {
   private _startTime = $state(0);
   private _startTimestamp: number | null = $state(null);
   private _time = $state(0);
+  private _timeToLerpTo = 0;
 
   private _onseek: TimelineProps['onseek'];
   private _ontick: TimelineProps['ontick'];
@@ -31,7 +31,8 @@ export class Timeline {
   );
 
   constructor({ onseek, ontick }: TimelineProps) {
-    this.clock = new Clock({ ontick: this._tick });
+    this._lerpClock = new Clock({ ontick: this._lerpTick });
+    this._mainClock = new Clock({ ontick: this._tick });
 
     this._onseek = onseek;
     this._ontick = ontick;
@@ -66,7 +67,7 @@ export class Timeline {
   }
 
   get isPlaying() {
-    return this.clock.isRunning;
+    return this._mainClock.isRunning;
   }
 
   get speedMultiplier() {
@@ -95,25 +96,30 @@ export class Timeline {
    * @param time
    */
   private _smoothSeek(time: number) {
-    const vel = (time - this._time) / SMOOTH_SEEK_DURATION;
+    this._timeToLerpTo = time;
 
-    const lerpClock = new Clock({
-      ontick: (timestamp: DOMHighResTimeStamp, dt: DOMHighResTimeStamp) => {
-        this._time =
-          vel > 0
-            ? Math.min(this._time + vel * dt, time)
-            : Math.max(this._time + vel * dt, time);
-
-        if (this._time === time) {
-          lerpClock.pause();
-        }
-
-        this._onseek(this._time);
-      },
-    });
-
-    lerpClock.resume();
+    if (!this._lerpClock.isRunning) {
+      this._lerpClock.resume();
+    }
   }
+
+  private _lerpTick = (
+    timestamp: DOMHighResTimeStamp,
+    dt: DOMHighResTimeStamp,
+  ) => {
+    const vel = (this._timeToLerpTo - this._time) * 0.01;
+
+    this._time =
+      vel > 0
+        ? Math.min(this._time + vel * dt, this._timeToLerpTo)
+        : Math.max(this._time + vel * dt, this._timeToLerpTo);
+
+    if (this._time === this._timeToLerpTo) {
+      this._lerpClock.pause();
+    }
+
+    this._onseek(this._time);
+  };
 
   private _tick = (timestamp: DOMHighResTimeStamp, dt: DOMHighResTimeStamp) => {
     this._time = this._time + dt * this._speedMultiplier;
@@ -157,7 +163,9 @@ export class Timeline {
   }
 
   pause() {
-    this.clock.pause();
+    this._lerpClock.pause();
+
+    this._mainClock.pause();
     this._audio?.pause();
 
     this._startTimestamp = null;
@@ -168,11 +176,13 @@ export class Timeline {
   }
 
   resume() {
-    if (!this.clock.isRunning && this._time >= this._duration) {
+    this._lerpClock.pause();
+
+    if (!this._mainClock.isRunning && this._time >= this._duration) {
       this.restart();
     }
 
-    this.clock.resume();
+    this._mainClock.resume();
     this._boundToPlayAudio = true;
   }
 
@@ -190,6 +200,8 @@ export class Timeline {
   }
 
   seek(time: number) {
+    this._lerpClock.pause();
+
     this._time = time;
     this._audio?.seek((this._time - this._startOffset) / 1000);
 
