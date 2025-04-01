@@ -41,7 +41,7 @@ export class Timeline {
     });
   }
 
-  private get _currentMeasureLength() {
+  private get _currentBeatLength() {
     if (!this._chartObjects) {
       return 0;
     }
@@ -50,7 +50,7 @@ export class Timeline {
       this._time,
     );
 
-    return this._chartObjects.timingEvents[currTimingEvtIndex].measureLength;
+    return this._chartObjects.timingEvents[currTimingEvtIndex].beatLength;
   }
 
   get audio() {
@@ -146,7 +146,7 @@ export class Timeline {
   forward(factor = 1) {
     const nextTime = Math.min(
       this._duration,
-      this._time + this._currentMeasureLength * factor,
+      this._time + this._currentBeatLength * factor,
     );
 
     if (!this.isPlaying) {
@@ -179,7 +179,7 @@ export class Timeline {
   rewind(factor = 1) {
     const nextTime = Math.max(
       this._startTime,
-      this._time - this._currentMeasureLength * factor,
+      this._time - this._currentBeatLength * factor,
     );
 
     if (!this.isPlaying) {
