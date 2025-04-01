@@ -23,6 +23,7 @@
 
     const target = event.target as HTMLElement;
     if (
+      !target.classList.contains('fixed') && // To block inputs from the loading overlay
       !target.closest('button') &&
       !target.closest('input') &&
       !parentElem.contains(target)
