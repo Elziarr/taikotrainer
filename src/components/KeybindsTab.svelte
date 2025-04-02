@@ -7,6 +7,13 @@
 
   let keybindToSet: KeybindName | null = null;
 
+  function camelToStartCase(camelCase: string) {
+    return camelCase
+      .replace(/([A-Z])/g, match => ` ${match}`)
+      .replace(/^./, match => match.toUpperCase())
+      .trim();
+  }
+
   function handleKeyDown(e: KeyboardEvent) {
     if (
       !keybindToSet ||
@@ -37,7 +44,7 @@
 
 <SettingGroup heading="Keybinds">
   {#each KeybindSettings.keybinds as [name, keybind] (name)}
-    <p>{name}</p>
+    <p>{camelToStartCase(name)}</p>
     <button
       class="button-panel p-0"
       onclick={() => {
