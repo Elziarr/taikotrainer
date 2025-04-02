@@ -121,9 +121,11 @@
     judger.judgeInput(input);
     playfield.displayDrumInput(input.type);
 
+    const currJudgeRecord = judger.judgements[judger.currentIndex];
     const prevJudgeIndex = Math.max(0, judger.currentIndex - 1);
     const prevJudgeRecord = judger.judgements[prevJudgeIndex];
     const toPlayBigSound =
+      currJudgeRecord instanceof HitCircleJudgement &&
       prevJudgeRecord instanceof HitCircleJudgement &&
       prevJudgeRecord.input !== null &&
       prevJudgeRecord.hitBigCorrectly;
