@@ -103,7 +103,7 @@
     onplaybacktoggle: handleTimelinePlayToggle,
     onrestart: () => timeline.restart(),
     onrestartfromprevious: () =>
-      checkpointTime && timeline.seek(checkpointTime),
+      timeline.seek(checkpointTime ?? timeline.startTime),
     onrewind: () => timeline.rewind(),
     onshortforward: () => timeline.forward(0.4),
     onshortrewind: () => timeline.rewind(0.4),
@@ -268,7 +268,7 @@
       onforward={() => timeline.forward()}
       onrestart={() => timeline.restart()}
       onrestartfromprevious={() =>
-        checkpointTime && timeline.seek(checkpointTime)}
+        timeline.seek(checkpointTime ?? timeline.startTime)}
       onseek={nextTime => timeline.seek(nextTime)}
     />
   </div>
