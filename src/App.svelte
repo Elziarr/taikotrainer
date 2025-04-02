@@ -218,7 +218,7 @@
     <ChartInfo {chartInfo} diff={chartObjects?.diff} />
   </div>
 
-  <div class="flex-col">
+  <div class="mt-3.5 flex-col">
     <p class="px-3 text-right">
       <MingcuteTargetLine class="mb-1 inline" />
       <span class="text-2xl">{scorer.accuracy.toFixed(2)}%</span>
