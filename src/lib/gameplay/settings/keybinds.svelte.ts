@@ -2,8 +2,8 @@ import EventEmitter from 'eventemitter3';
 
 const DEFAULT_KEYBINDS = {
   autoplayToggle: 'a',
-  checkpointTimeClear: 'shift+p',
-  checkpointTimeSet: 'p',
+  checkpointTimeClear: 'shift+m',
+  checkpointTimeSet: 'm',
   densityDown: '3',
   densityUp: '4',
   fineDensityDown: 'alt+3',
