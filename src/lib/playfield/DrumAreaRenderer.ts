@@ -39,11 +39,6 @@ export class DrumAreaRenderer extends Container {
     this._rightKa.position.set(centerX, centerY);
     this._comboText.position.set(centerX, centerY);
 
-    // Workaround; can't await font loading via pixi's loader for some reason
-    document.fonts.onloadingdone = () => {
-      this._comboText.text = '0';
-    };
-
     Ticker.shared.add(this._loop);
     Ticker.shared.start();
   }

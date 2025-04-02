@@ -80,6 +80,10 @@ const manifest = {
 await Assets.init({ manifest });
 await Assets.loadBundle(['sprites']);
 
+// Force the font to load since pixi.js would have displayed text already
+// before this.
+await document.fonts.load('12px Sour Gummy');
+
 const app = mount(App, {
   target: document.getElementById('app')!,
 });
