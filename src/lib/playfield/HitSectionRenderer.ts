@@ -66,8 +66,10 @@ export class HitSectionRenderer extends Container {
   updateCurrentJudgementIndex(newCurrentJudgementIndex: number) {
     this._currentJudgementIndex = newCurrentJudgementIndex;
   }
+
   updateJudgements(newJudgements: HitObjectJudgement[]) {
     this._judgements = newJudgements;
+    this._render();
   }
 
   updateTime(newTime: number) {

@@ -215,11 +215,20 @@ export class Timeline {
     this._onseek(this._time);
   }
 
-  setChart(chartObjects: ChartObjects, chartAudio: Howl) {
+  setChart(chartObjects: ChartObjects | null, chartAudio: Howl | null) {
     this._chartObjects = chartObjects;
 
     this._audio?.unload();
     this._audio = chartAudio;
+
+    if (!this._chartObjects) {
+      this._duration = 0;
+      this._startTime = 0;
+
+      this.pause();
+      this.restart();
+      return;
+    }
 
     const startOffsetLength =
       this._chartObjects.timingEvents[0].measureLength || 0;
@@ -233,7 +242,7 @@ export class Timeline {
 
     this._duration = Math.min(
       lastHitTime + startOffsetLength,
-      this._audio.duration() * 1000,
+      this._audio!.duration() * 1000,
     );
 
     this.pause();

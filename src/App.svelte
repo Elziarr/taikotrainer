@@ -26,6 +26,7 @@
     loadChartObjects,
   } from './lib/loading/loading';
   import type { ChartFiles } from './lib/loading/uploading';
+  import { Howl } from 'howler';
   import MdiFile from '~icons/mdi/file';
   import MdiKeyboard from '~icons/mdi/keyboard';
   import MingcuteSettings2Fill from '~icons/mingcute/settings-2-fill';
@@ -156,6 +157,7 @@
       return;
     }
 
+    setChartObjects(null, null);
     GameplaySettings.speedMultiplier = 1.0;
     GameplaySettings.densityMultiplier = 1.0;
 
@@ -167,13 +169,10 @@
     showLoadingOverlay = true;
 
     // TODO: Don't load the same audio twice (especially when simply diff changing)
-    const chartAudio = await loadAudioFile(chartInfo!.audioFile);
-    chartObjects = await loadChartObjects(chartInfo!.diffs[index]);
-
-    timeline.setChart(chartObjects, chartAudio);
-
-    judger.chartObjects = chartObjects;
-    autoplayer.chartObjects = chartObjects;
+    setChartObjects(
+      await loadChartObjects(chartInfo!.diffs[index]),
+      await loadAudioFile(chartInfo!.audioFile),
+    );
 
     showLoadingOverlay = false;
   }
@@ -209,6 +208,19 @@
     if (timeline.time !== timeline.startTime) {
       judger.bypassTimeJudgements = true;
     }
+  }
+
+  function setChartObjects(co: ChartObjects | null, audio: Howl | null) {
+    chartObjects = co;
+
+    timeline.setChart(chartObjects, audio);
+    checkpointTime = null;
+
+    judger.chartObjects = chartObjects;
+    autoplayer.chartObjects = chartObjects;
+    scorer.reset();
+
+    playfield.resetJudgements();
   }
 </script>
 
