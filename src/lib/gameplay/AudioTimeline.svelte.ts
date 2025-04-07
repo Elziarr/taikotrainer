@@ -9,6 +9,8 @@ interface TimelineProps {
   ontick: (time: number) => void;
 }
 
+const SMOOTH_SEEK_FACTOR = 0.07;
+
 export class Timeline {
   private _lerpClock: Clock;
   private _mainClock: Clock;
@@ -107,7 +109,7 @@ export class Timeline {
     timestamp: DOMHighResTimeStamp,
     dt: DOMHighResTimeStamp,
   ) => {
-    const vel = (this._timeToLerpTo - this._time) * 0.01;
+    const vel = (this._timeToLerpTo - this._time) * SMOOTH_SEEK_FACTOR;
 
     this._time =
       vel > 0
