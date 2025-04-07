@@ -17,6 +17,7 @@
     constantDensity: boolean;
     currentJudgementIndex: number;
     densityMultiplier: number;
+    duration: number;
     goodWindow: number;
     greatWindow: number;
     judgements: HitObjectJudgement[];
@@ -31,6 +32,7 @@
     constantDensity,
     currentJudgementIndex,
     densityMultiplier,
+    duration,
     goodWindow,
     greatWindow,
     judgements,
@@ -45,6 +47,7 @@
   $effect(() => playfield.updateConstantDensity(constantDensity));
   $effect(() => playfield.updateCurrentJudgementIndex(currentJudgementIndex));
   $effect(() => playfield.updateDensityMultiplier(densityMultiplier));
+  $effect(() => playfield.updateDuration(duration));
   $effect(() => playfield.updateGoodWindow(goodWindow));
   $effect(() => playfield.updateGreatWindow(greatWindow));
   $effect(() => playfield.updateJudgements(judgements));

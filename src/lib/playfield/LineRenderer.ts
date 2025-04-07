@@ -1,4 +1,5 @@
 import type { ChartObjects } from '../chart/ChartObjects';
+import type { TimingEvent } from '../chart/events';
 import { BASE_HEIGHT, BASE_WIDTH } from './Playfield';
 import { AlphaFilter, Container, Graphics, GraphicsContext } from 'pixi.js';
 
@@ -6,6 +7,8 @@ const CHECKPOINT_LINE_TRIANGLE_SIZE = 12;
 const LINE_CTX = new GraphicsContext()
   .lineTo(0, 1)
   .stroke({ width: 1.5, color: 0xffffff });
+const LINE_END_TIME_MARGIN = 5000;
+const LINE_START_TIME_MARGIN = 12000;
 
 export class LineRenderer extends Container {
   private _playfieldHeight = BASE_HEIGHT;
@@ -14,29 +17,11 @@ export class LineRenderer extends Container {
   private _chartObjects: ChartObjects | null = null;
   private _checkpointTime: number | null = null;
   private _constantDensity = false;
+  private _duration = 0;
   private _densityMultiplier = 1;
   private _leftMargin = 0;
   private _playfieldWidth = BASE_WIDTH;
   private _time = 0;
-
-  private _getAssumedLineX(lineAtTime: number) {
-    return (
-      this._getVelocity(lineAtTime) * (lineAtTime - this._time) +
-      this._leftMargin
-    );
-  }
-
-  private _getEarliestMeasureLineTime(timingEvtIndex: number) {
-    const timingEvt = this._chartObjects!.timingEvents[timingEvtIndex];
-
-    const priorMeasureLineTime = nearestPriorMultiple(
-      timingEvt.measureLength,
-      timingEvt.time,
-      this._time,
-    );
-
-    return Math.max(priorMeasureLineTime, timingEvt.time);
-  }
 
   private _getVelocity(time: number) {
     if (!this._chartObjects) {
@@ -51,47 +36,22 @@ export class LineRenderer extends Container {
     );
   }
 
-  private *_getVisibleLines() {
-    // Go through each timing event instead of starting from the current one
-    // since it's easier to work with weird SV quirks this way.
-    for (const evtIndex of this._chartObjects!.timingEvents.keys()) {
-      if (this._timingEventNotInDisplayBounds(evtIndex)) {
-        continue;
-      }
+  private _getStartingLineTime(timingEvt: TimingEvent) {
+    // Depending on how tight the lines will end up being displayed, offset
+    // backwards from the line nearest to the current time so that the other
+    // lines that should be displayed before the present line are also displayed.
+    const priorVelocity = this._getVelocity(
+      this._time - timingEvt.measureLength,
+    );
+    const compensationOffset =
+      LINE_START_TIME_MARGIN / (priorVelocity * timingEvt.measureLength);
 
-      const startLineTime = this._getEarliestMeasureLineTime(evtIndex);
-      yield* this._getVisibleLinesForTimingEvent(evtIndex, startLineTime);
-    }
-  }
-
-  private *_getVisibleLinesForTimingEvent(
-    timingEvtIndex: number,
-    startLineTime: number,
-  ) {
-    const currTimingEvt = this._chartObjects!.timingEvents[timingEvtIndex];
-
-    const nextTimingEvtIndex = timingEvtIndex + 1;
-    const nextTimingEvt = this._chartObjects!.timingEvents[nextTimingEvtIndex];
-
-    let currLineTime = startLineTime;
-
-    while (
-      currLineTime - startLineTime <
-      currTimingEvt.measureLength * currTimingEvt.beatsPerMeasure
-    ) {
-      const roundedTime = Math.floor(currLineTime);
-
-      if (nextTimingEvt && roundedTime >= Math.floor(nextTimingEvt.time)) {
-        break;
-      }
-
-      yield {
-        time: roundedTime,
-        velocity: this._getVelocity(currLineTime),
-      };
-
-      currLineTime += currTimingEvt.measureLength;
-    }
+    const nearestPriorLineTime = nearestPriorMultiple(
+      timingEvt.measureLength,
+      timingEvt.time,
+      this._time - compensationOffset,
+    );
+    return Math.max(nearestPriorLineTime, timingEvt.time);
   }
 
   private _render() {
@@ -103,12 +63,50 @@ export class LineRenderer extends Container {
 
     this._renderCheckpointLine();
 
-    for (const { time: lineTime, velocity } of this._getVisibleLines()) {
-      const lineSprite = new Graphics(LINE_CTX);
-      lineSprite.x = velocity * (lineTime - this._time) + this._leftMargin;
-      lineSprite.scale.y = this._playfieldHeight;
+    for (const [i, timingEvt] of this._chartObjects.timingEvents.entries()) {
+      const timingEvtEndTime =
+        this._chartObjects.timingEvents[i + 1]?.time ?? this._duration;
 
-      this.addChild(lineSprite);
+      let lineTime = this._getStartingLineTime(timingEvt);
+
+      // Use floor(time) as a basis since otherwise some lines will be redundant.
+      while (Math.floor(lineTime) < Math.floor(timingEvtEndTime)) {
+        if (!timingEvt.linesVisibleAt(lineTime)) {
+          lineTime += timingEvt.measureLength;
+          continue;
+        }
+
+        const vel = this._getVelocity(lineTime);
+        const lineX = vel * (lineTime - this._time) + this._leftMargin;
+
+        // Rendering outside of the playfield bounds needs to be allowed because
+        // of velocity changes making succeeding lines in-screen despite previous
+        // lines already being out of the screen.
+        if (lineX >= 0 && lineX <= this._playfieldWidth) {
+          const lineSprite = new Graphics(LINE_CTX);
+          lineSprite.x = lineX;
+          lineSprite.scale.y = this._playfieldHeight;
+
+          this.addChild(lineSprite);
+        }
+
+        // Only stop rendering lines if it can be assumed that there will be no
+        // velocity changes in the near future since these velocity changes can
+        // make succeeding lines in-screen despite previous lines already being
+        // out of the screen.
+        else if (
+          lineX > this._playfieldWidth &&
+          vel ===
+            this._getVelocity(
+              this._time +
+                LINE_END_TIME_MARGIN / (vel * timingEvt.measureLength),
+            )
+        ) {
+          break;
+        }
+
+        lineTime += timingEvt.measureLength;
+      }
     }
   }
 
@@ -117,7 +115,8 @@ export class LineRenderer extends Container {
       return;
     }
 
-    const lineX = this._getAssumedLineX(this._checkpointTime);
+    const vel = this._getVelocity(this._checkpointTime);
+    const lineX = vel * (this._checkpointTime - this._time) + this._leftMargin;
 
     if (lineX < 0 || lineX >= this._playfieldWidth) {
       return;
@@ -129,26 +128,6 @@ export class LineRenderer extends Container {
       x: lineX,
     });
     this.addChild(checkpointLine);
-  }
-
-  private _timingEventNotInDisplayBounds(timingEvtIndex: number) {
-    const timingEvt = this._chartObjects!.timingEvents[timingEvtIndex];
-
-    // If the event start is still offscreen to the right:
-    if (this._getAssumedLineX(timingEvt.time) > this._playfieldWidth) {
-      return true;
-    }
-
-    const nextEvtIndex = timingEvtIndex + 1;
-
-    // If the event is the last event:
-    if (nextEvtIndex === this._chartObjects!.timingEvents.length) {
-      return false;
-    }
-
-    // If the next event's start is already offscreen to the left:
-    const nextEvt = this._chartObjects!.timingEvents[nextEvtIndex];
-    return this._getAssumedLineX(nextEvt.time) < 0;
   }
 
   setLeftMargin(leftMargin: number) {
@@ -172,8 +151,6 @@ export class LineRenderer extends Container {
   updateChartObjects(newChartObjects: ChartObjects | null) {
     this._chartObjects = newChartObjects;
     this._render();
-
-    console.log(newChartObjects);
   }
 
   updateCheckpointTime(newCheckpointTime: number | null) {
@@ -188,6 +165,11 @@ export class LineRenderer extends Container {
 
   updateDensityMultiplier(newDensityMultiplier: number) {
     this._densityMultiplier = newDensityMultiplier;
+    this._render();
+  }
+
+  updateDuration(newDuration: number) {
+    this._duration = newDuration;
     this._render();
   }
 

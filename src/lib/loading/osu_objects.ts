@@ -12,7 +12,7 @@ import {
 
 type DecodedBeatmap = ReturnType<BeatmapDecoder['decodeFromBuffer']>;
 
-enum HitSound {
+const enum HitSound {
   None = 0,
   Normal = 1,
   Whistle = 2,
@@ -20,7 +20,7 @@ enum HitSound {
   Clap = 8,
 }
 
-enum HitType {
+const enum HitType {
   Normal = 1,
   Slider = 2,
   NewCombo = 4,
@@ -135,7 +135,13 @@ function getKiaiTimeEvents(beatmap: DecodedBeatmap) {
 
 function getTimingEvents(beatmap: DecodedBeatmap) {
   return beatmap.controlPoints.timingPoints.map(
-    tp => new TimingEvent(tp.startTime, tp.beatLength, tp.timeSignature),
+    tp =>
+      new TimingEvent(
+        tp.startTime,
+        tp.beatLength,
+        tp.beatLength * tp.timeSignature,
+        tp.beatLength * tp.timeSignature,
+      ),
   );
 }
 

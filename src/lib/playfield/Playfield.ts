@@ -95,6 +95,10 @@ export class Playfield extends Container {
     this._lines.updateDensityMultiplier(newDensityMultiplier);
   }
 
+  updateDuration(newDuration: number) {
+    this._lines.updateDuration(newDuration);
+  }
+
   updateGoodWindow(newGoodWindow: number) {
     this._urBar.updateGoodWindow(newGoodWindow);
   }

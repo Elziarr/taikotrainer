@@ -233,6 +233,7 @@
       constantDensity={GameplaySettings.constantDensity}
       currentJudgementIndex={judger.currentIndex}
       densityMultiplier={GameplaySettings.densityMultiplier}
+      duration={timeline.duration}
       judgements={judger.judgements}
       goodWindow={GameplaySettings.goodWindow}
       greatWindow={GameplaySettings.greatWindow}

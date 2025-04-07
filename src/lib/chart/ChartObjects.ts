@@ -80,6 +80,6 @@ export class ChartObjects {
       this.difficultyEvents[this.getActiveDifficultyEventIndex(time)];
     const timingEvt = this.timingEvents[this.getActiveTimingEventIndex(time)];
 
-    return diffEvt.scrollRate / timingEvt.measureLength;
+    return diffEvt.scrollRate / timingEvt.timingLength;
   }
 }
