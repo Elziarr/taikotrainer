@@ -1,30 +1,33 @@
+import type { ActionName } from '../actions';
 import EventEmitter from 'eventemitter3';
 
-const DEFAULT_KEYBINDS = {
-  autoplayToggle: 'a',
-  checkpointTimeClear: 'shift+m',
-  checkpointTimeSet: 'm',
-  densityDown: '3',
-  densityUp: '4',
-  fineDensityDown: 'alt+3',
-  fineDensityUp: 'alt+4',
-  fineSlowDown: 'alt+1',
-  fineSpeedUp: 'alt+2',
+type GameInputs = 'leftDon' | 'leftKa' | 'rightDon' | 'rightKa';
+
+const DEFAULT_KEYBINDS: Record<ActionName | GameInputs, string> = {
+  clearCheckpointTime: 'shift+m',
+  decreaseDensity: '3',
+  decreaseSpeed: '1',
+  fineDecreaseDensity: 'alt+3',
+  fineDecreaseSpeed: 'alt+1',
+  fineIncreaseDensity: 'alt+4',
+  fineIncreaseSpeed: 'alt+2',
   forward: ']',
+  increaseDensity: '4',
+  increaseSpeed: '2',
   leftDon: 'f',
   leftKa: 'd',
   longForward: 'shift+]',
   longRewind: 'shift+[',
-  playbackToggle: 'space',
   restart: 'shift+`',
   restartFromPrevious: '`',
   rewind: '[',
   rightDon: 'j',
   rightKa: 'k',
+  setCheckpointTime: 'm',
   shortForward: 'alt+]',
   shortRewind: 'alt+[',
-  slowDown: '1',
-  speedUp: '2',
+  toggleAutoplay: 'a',
+  togglePlayback: 'space',
 };
 
 export type KeybindName = keyof typeof DEFAULT_KEYBINDS;

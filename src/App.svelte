@@ -15,9 +15,10 @@
   import { AutoPlayer } from './lib/gameplay/AutoPlayer.svelte';
   import { Judger } from './lib/gameplay/Judger.svelte';
   import { SfxPlayer } from './lib/gameplay/SfxPlayer.svelte';
+  import { initActions } from './lib/gameplay/actions';
   import { gameInput, type GameInput } from './lib/gameplay/input.svelte';
   import { HitCircleJudgement } from './lib/gameplay/judgements';
-  import { handleKeybinds } from './lib/gameplay/keybinds';
+  import { bindKeybinds } from './lib/gameplay/keybinds';
   import { Scorer } from './lib/gameplay/scorer.svelte';
   import { GameplaySettings } from './lib/gameplay/settings/gameplay.svelte';
   import {
@@ -73,48 +74,15 @@
     judger.missWindow = GameplaySettings.missWindow;
   });
 
-  handleKeybinds({
-    onautoplaytoggle: () =>
-      (GameplaySettings.autoplay = !GameplaySettings.autoplay),
-    oncheckpointtimeclear: () => (checkpointTime = null),
-    oncheckpointtimeset: () => {
-      checkpointTime = timeline.time;
+  const actions = initActions({
+    checkpointTime: {
+      get: () => checkpointTime,
+      set: value => (checkpointTime = value),
     },
-    ondensitydown: () =>
-      (GameplaySettings.densityMultiplier = Math.max(
-        0.1,
-        GameplaySettings.densityMultiplier - 0.1,
-      )),
-    ondensityup: () => (GameplaySettings.densityMultiplier += 0.1),
-    onfinedensitydown: () =>
-      (GameplaySettings.densityMultiplier = Math.max(
-        0.05,
-        GameplaySettings.densityMultiplier - 0.05,
-      )),
-    onfinedensityup: () => (GameplaySettings.densityMultiplier += 0.05),
-    onfineslowdown: () =>
-      (GameplaySettings.speedMultiplier = Math.max(
-        0.05,
-        GameplaySettings.speedMultiplier - 0.05,
-      )),
-    onfinespeedup: () => (GameplaySettings.speedMultiplier += 0.05),
-    onforward: () => timeline.forward(),
-    onlongforward: () => timeline.forward(2.5),
-    onlongrewind: () => timeline.rewind(2.5),
-    onplaybacktoggle: handleTimelinePlayToggle,
-    onrestart: () => timeline.restart(),
-    onrestartfromprevious: () =>
-      timeline.seek(checkpointTime ?? timeline.startTime),
-    onrewind: () => timeline.rewind(),
-    onshortforward: () => timeline.forward(0.4),
-    onshortrewind: () => timeline.rewind(0.4),
-    onslowdown: () =>
-      (GameplaySettings.speedMultiplier = Math.max(
-        0.1,
-        GameplaySettings.speedMultiplier - 0.1,
-      )),
-    onspeedup: () => (GameplaySettings.speedMultiplier += 0.1),
+    timeline,
+    gameplaySettings: GameplaySettings,
   });
+  bindKeybinds(actions);
 
   function applyGameInput(input: GameInput) {
     judger.bypassTimeJudgements = false;
@@ -183,14 +151,6 @@
     }
 
     applyGameInput(input);
-  }
-
-  function handleTimelinePlayToggle() {
-    if (timeline.isPlaying) {
-      timeline.pause();
-    } else {
-      timeline.resume();
-    }
   }
 
   function handleTimelineTick(currTime: number) {
@@ -275,13 +235,12 @@
       startTime={timeline.startTime}
       speedMultiplier={GameplaySettings.speedMultiplier}
       time={timeline.time}
-      oncheckpointtimeset={() => (checkpointTime = timeline.time)}
-      onplaytoggle={handleTimelinePlayToggle}
-      onrewind={() => timeline.rewind()}
-      onforward={() => timeline.forward()}
-      onrestart={() => timeline.restart()}
-      onrestartfromprevious={() =>
-        timeline.seek(checkpointTime ?? timeline.startTime)}
+      oncheckpointtimeset={actions.setCheckpointTime}
+      onforward={actions.forward}
+      onplaytoggle={actions.togglePlayback}
+      onrestart={actions.restart}
+      onrestartfromprevious={actions.restartFromPrevious}
+      onrewind={actions.rewind}
       onseek={nextTime => timeline.seek(nextTime)}
     />
   </div>
