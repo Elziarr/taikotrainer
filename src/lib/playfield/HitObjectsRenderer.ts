@@ -292,11 +292,11 @@ export class HitObjectsRenderer extends Container {
     }
 
     this._time = newTime;
-
     this._render();
   }
 
   updatePlayfieldWidth(newWidth: number) {
     this._playfieldWidth = newWidth;
+    this._render();
   }
 }

@@ -39,7 +39,17 @@
     time,
   }: Props = $props();
 
+  const BASE_Y_OFFSET = 75;
+
+  /**
+   * For making hit objects fly out of the playfield without getting cut off.
+   */
+  let yOffset = $state(BASE_Y_OFFSET);
+
   const playfield = new Playfield();
+  playfield.y = BASE_Y_OFFSET;
+
+  // TODO: Better state management!!
   $effect(() => playfield.updateChartObjects(chartObjects));
   $effect(() => playfield.updateCheckpointTime(checkpointTime));
   $effect(() => playfield.updateColoredJudgements(coloredJudgements));
@@ -65,14 +75,23 @@
     playfield.resetJudgements();
   }
 
-  function handleWidthChange(newWidth: number) {
-    playfield.updateWidth(newWidth);
+  function handleWidthChange(newWidth: number, newHeight: number) {
+    const xRatio = Math.min(newWidth / BASE_WIDTH, 1);
+    const yRatio = Math.min(newHeight / (BASE_HEIGHT + BASE_Y_OFFSET), 1);
+    const playfieldScale = xRatio * yRatio;
+
+    yOffset = BASE_Y_OFFSET * yRatio;
+    playfield.y = yOffset;
+
+    playfield.updateWidth(newWidth / playfieldScale);
+    playfield.scale.set(playfieldScale);
   }
 </script>
 
 <PlayfieldCanvas
-  baseWidth={BASE_WIDTH}
-  baseHeight={BASE_HEIGHT}
+  class="relative -z-10"
+  baseHeight={BASE_HEIGHT + yOffset}
   root={playfield}
+  style="translate: 0 -{yOffset}px;"
   onwidthchange={handleWidthChange}
 />

@@ -1,23 +1,20 @@
 <script lang="ts">
   import { Application, Container } from 'pixi.js';
+  import type { ClassValue } from 'svelte/elements';
 
   interface Props {
-    baseWidth: number;
     baseHeight: number;
-    /**
-     * Percentage of the screen height that the canvas should take up, with
-     * `baseHeight` as the maximum bound.
-     */
-    heightScaleFactor?: number;
+    class?: ClassValue;
     root?: Container;
-    onwidthchange?: (newWidth: number) => void;
+    style?: string;
+    onwidthchange?: (newWidth: number, newHeight: number) => void;
   }
 
   let {
-    baseWidth,
+    class: _class,
     baseHeight,
-    heightScaleFactor = 0.5,
     root = new Container(),
+    style,
     onwidthchange = () => {},
   }: Props = $props();
 
@@ -30,7 +27,7 @@
       .init({
         antialias: true,
         canvas: canvasElem,
-        // background: '0x353535',
+        // background: '0x350000',
         resolution: window.devicePixelRatio,
       })
       .then(() => resizeToFit());
@@ -41,33 +38,21 @@
   });
 
   function resizeToFit() {
-    // Step 1: Determine the actual canvas size, factoring in the width and
-    // height scales.
     const canvasWidth = canvasElem.parentElement
       ? canvasElem.parentElement.clientWidth
       : window.innerWidth;
-    const widthResizeScale = Math.min(canvasWidth / baseWidth, 1);
 
-    const canvasHeight =
-      Math.min(heightScaleFactor * window.innerHeight, baseHeight) *
-      widthResizeScale;
-
-    // Step 2: Scale the renderer size to the actual canvas size, with the
-    // renderer width taking up the whole canvas width.
-    const rendererResizeScale = Math.min(
-      canvasWidth / baseWidth,
-      canvasHeight / baseHeight,
-    );
-
-    pixiApp.renderer.resize(canvasWidth / rendererResizeScale, baseHeight);
-    canvasElem.style.maxHeight = `${canvasHeight}px`;
-
-    onwidthchange(canvasElem.clientWidth);
+    pixiApp.renderer.resize(canvasWidth, canvasElem.clientHeight);
+    onwidthchange(canvasElem.clientWidth, canvasElem.clientHeight);
   }
 </script>
 
 <svelte:window on:resize={resizeToFit} />
 
-<canvas bind:this={canvasElem} class="w-full">
+<canvas
+  bind:this={canvasElem}
+  class={[_class, 'w-full']}
+  style="height: min(55vh, {baseHeight}px); {style};"
+>
   Sorry, canvas isn't supported.
 </canvas>
