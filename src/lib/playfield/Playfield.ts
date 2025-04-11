@@ -10,9 +10,9 @@ import { URBar } from './URBar.svelte';
 import { Assets, Container } from 'pixi.js';
 
 export const BASE_WIDTH = 800;
-export const BASE_HEIGHT = 250;
+export const BASE_HEIGHT = 260;
 
-const HIT_SECTION_MARGIN = 120;
+const HIT_SECTION_MARGIN = 52;
 const UR_BAR_Y_MARGIN = 15;
 
 export class Playfield extends Container {
@@ -38,17 +38,20 @@ export class Playfield extends Container {
     // Enclose in setTimeout() to wait for textures to load in children.
     setTimeout(async () => {
       const mainHeight = (await Assets.load('playfield_left')).height;
-      this._track.height = mainHeight;
+      this._track.height = mainHeight * 0.95;
+      this._track.y = (mainHeight - this._track.height) / 2;
 
-      this._hitSection.x = this._drumArea.width + HIT_SECTION_MARGIN;
-      this._hitSection.y = this._track.height / 2;
+      this._hitSection.x =
+        this._drumArea.width + this._hitSection.width / 2 + HIT_SECTION_MARGIN;
+      this._hitSection.y = mainHeight / 2;
 
       this._hitObjects.setLeftMargin(this._hitSection.x);
       this._hitObjects.setPlayfieldHeight(mainHeight);
       this._hitObjects.height = 100;
 
+      this._lines.y = this._track.y;
       this._lines.setLeftMargin(this._hitSection.x);
-      this._lines.setPlayfieldHeight(mainHeight);
+      this._lines.setPlayfieldHeight(this._track.height);
     }, 0);
   }
 

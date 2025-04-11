@@ -4,6 +4,12 @@ import {
 } from '../gameplay/judgements';
 import { Assets, Container, Graphics, Sprite } from 'pixi.js';
 
+const GOOD_COLOR = '#ffffff';
+const GOOD_EARLY_COLOR = '#ff991c';
+const GOOD_LATE_COLOR = '#0bda51';
+const GREAT_COLOR = '#eeee00';
+const MISS_COLOR = '#e73121';
+
 export class HitSectionRenderer extends Container {
   private _currentJudgementIndex = 0;
   private _judgements: HitObjectJudgement[] = [];
@@ -43,19 +49,19 @@ export class HitSectionRenderer extends Container {
     this._judgementBurst.scale = Math.min(1.15, dt / 75 + 0.5);
 
     if (record.judgement === 'great') {
-      this._judgementBurst.tint = 'yellow';
+      this._judgementBurst.tint = GREAT_COLOR;
     } else if (record.judgement === 'good') {
       if (this._toggleJudgementFlash) {
         if (record.hitDelta! > 0) {
-          this._judgementBurst.tint = 'lightgreen';
+          this._judgementBurst.tint = GOOD_LATE_COLOR;
         } else {
-          this._judgementBurst.tint = 'orange';
+          this._judgementBurst.tint = GOOD_EARLY_COLOR;
         }
       } else {
-        this._judgementBurst.tint = 'white';
+        this._judgementBurst.tint = GOOD_COLOR;
       }
     } else {
-      this._judgementBurst.tint = 'red';
+      this._judgementBurst.tint = MISS_COLOR;
     }
   }
 

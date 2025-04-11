@@ -49,6 +49,10 @@ const manifest = {
           src: 'sprites/drumroll_head_big.png',
         },
         {
+          alias: 'drumroll_body',
+          src: 'sprites/drumroll_body.png',
+        },
+        {
           alias: 'drumroll_tail',
           src: 'sprites/drumroll_tail.png',
         },
@@ -63,14 +67,6 @@ const manifest = {
         {
           alias: 'drum_left_ka',
           src: 'sprites/drum_left_ka.png',
-        },
-        {
-          alias: 'drum_right_don',
-          src: 'sprites/drum_right_don.png',
-        },
-        {
-          alias: 'drum_right_ka',
-          src: 'sprites/drum_right_ka.png',
         },
       ],
     },

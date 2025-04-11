@@ -6,7 +6,7 @@ import { AlphaFilter, Container, Graphics, GraphicsContext } from 'pixi.js';
 const CHECKPOINT_LINE_TRIANGLE_SIZE = 12;
 const LINE_CTX = new GraphicsContext()
   .lineTo(0, 1)
-  .stroke({ width: 1.5, color: 0xffffff });
+  .stroke({ width: 2, color: 0x999999 });
 const LINE_END_TIME_MARGIN = 5000;
 const LINE_START_TIME_MARGIN = 12000;
 

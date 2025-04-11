@@ -1,8 +1,7 @@
 import type { GameInputType } from '../gameplay/input.svelte';
 import { Assets, BitmapText, Container, Sprite } from 'pixi.js';
-import { Ticker } from 'pixi.js';
 
-const DRUM_HIT_FADE_VEL = 0.004;
+const INPUT_DISPLAY_DURATION = 100;
 
 export class DrumAreaRenderer extends Container {
   private _background = new Sprite();
@@ -13,7 +12,7 @@ export class DrumAreaRenderer extends Container {
   private _rightKa = new Sprite({ anchor: 0.5, alpha: 0 });
   private _comboText = new BitmapText({
     anchor: 0.5,
-    style: { fontFamily: 'Sour Gummy', fontSize: 30, fill: 0x000000 },
+    style: { fontFamily: 'Sour Gummy', fontSize: 30, fill: 0x333333 },
   });
 
   constructor() {
@@ -38,58 +37,42 @@ export class DrumAreaRenderer extends Container {
     this._rightDon.position.set(centerX, centerY);
     this._rightKa.position.set(centerX, centerY);
     this._comboText.position.set(centerX, centerY);
-
-    Ticker.shared.add(this._loop);
-    Ticker.shared.start();
   }
 
   private _loadTextures() {
     this._background.texture = Assets.get('playfield_left');
 
     this._drumBody.texture = Assets.get('drum');
+
     this._leftKa.texture = Assets.get('drum_left_ka');
+    this._rightKa.texture = Assets.get('drum_left_ka');
+    this._rightKa.scale.x = -1;
+
     this._leftDon.texture = Assets.get('drum_left_don');
-    this._rightDon.texture = Assets.get('drum_right_don');
-    this._rightKa.texture = Assets.get('drum_right_ka');
+    this._rightDon.texture = Assets.get('drum_left_don');
+    this._rightDon.scale.x = -1;
   }
-
-  private _loop = () => {
-    const dt = Ticker.shared.deltaMS;
-
-    this._leftKa.alpha = Math.max(
-      0,
-      this._leftKa.alpha - DRUM_HIT_FADE_VEL * dt,
-    );
-    this._leftDon.alpha = Math.max(
-      0,
-      this._leftDon.alpha - DRUM_HIT_FADE_VEL * dt,
-    );
-    this._rightDon.alpha = Math.max(
-      0,
-      this._rightDon.alpha - DRUM_HIT_FADE_VEL * dt,
-    );
-    this._rightKa.alpha = Math.max(
-      0,
-      this._rightKa.alpha - DRUM_HIT_FADE_VEL * dt,
-    );
-  };
 
   displayInput(type: GameInputType) {
     switch (type) {
       case 'left_ka':
         this._leftKa.alpha = 1;
+        setTimeout(() => (this._leftKa.alpha = 0), INPUT_DISPLAY_DURATION);
         break;
 
       case 'left_don':
         this._leftDon.alpha = 1;
+        setTimeout(() => (this._leftDon.alpha = 0), INPUT_DISPLAY_DURATION);
         break;
 
       case 'right_don':
         this._rightDon.alpha = 1;
+        setTimeout(() => (this._rightDon.alpha = 0), INPUT_DISPLAY_DURATION);
         break;
 
       case 'right_ka':
         this._rightKa.alpha = 1;
+        setTimeout(() => (this._rightKa.alpha = 0), INPUT_DISPLAY_DURATION);
         break;
     }
   }

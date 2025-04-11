@@ -2,22 +2,25 @@ import { Container, Graphics, GraphicsContext, Ticker } from 'pixi.js';
 
 const AVG_INDICATOR_COLOR = 0xffffff;
 const AVG_INDICATOR_MARGIN = 15;
-const AVG_INDICATOR_HEIGHT = 20;
+const AVG_INDICATOR_HEIGHT = 22;
 const AVG_INDICATOR_WIDTH = 15;
 const BAR_HEIGHT = 12;
 const BAR_WIDTH = 570;
 const GREAT_BAR_COLOR = 0x0000ff;
 const INDICATOR_LERP_FACTOR = 0.007;
+const JUDGEMENT_LINE_COLOR = 0xdedede;
 const JUDGEMENT_LINE_HEIGHT = BAR_HEIGHT * 2;
 const MIDDLE_LINE_COLOR = 0xffffff;
-const MIDDLE_LINE_HEIGHT = BAR_HEIGHT * 2.5;
-const OK_BAR_COLOR = 0x00ff00;
+const MIDDLE_LINE_HEIGHT = BAR_HEIGHT * 2.3;
+const OK_BAR_COLOR = 0x12d554;
 const USE_COUNT = 15;
 
 const JUDGEMENT_LINE_CTX = new GraphicsContext()
   .lineTo(0, JUDGEMENT_LINE_HEIGHT)
   .stroke({
-    color: MIDDLE_LINE_COLOR,
+    alpha: 0.8,
+    cap: 'round',
+    color: JUDGEMENT_LINE_COLOR,
     width: 2,
   });
 
@@ -26,7 +29,9 @@ export class URBar extends Container {
   private _greatWindow = 25;
   private _lastHitDelta = 0;
 
-  private _okBar = new Graphics().rect(0, 0, 1, BAR_HEIGHT).fill(OK_BAR_COLOR);
+  private _okBar = new Graphics()
+    .roundRect(0, 0, 500, BAR_HEIGHT, 3)
+    .fill(OK_BAR_COLOR);
   private _greatBar = new Graphics()
     .rect(0, 0, 1, BAR_HEIGHT)
     .fill(GREAT_BAR_COLOR);
@@ -39,16 +44,22 @@ export class URBar extends Container {
   })
     .lineTo(0, MIDDLE_LINE_HEIGHT)
     .stroke({
+      cap: 'round',
       color: MIDDLE_LINE_COLOR,
-      width: 2,
+      width: 3,
     });
   private _latestIndicator = new Graphics({
     x: BAR_WIDTH / 2,
     y: -AVG_INDICATOR_MARGIN,
   })
-    .lineTo(-AVG_INDICATOR_WIDTH / 2, -AVG_INDICATOR_HEIGHT)
-    .lineTo(AVG_INDICATOR_WIDTH / 2, -AVG_INDICATOR_HEIGHT)
-    .lineTo(0, 0)
+    .roundShape(
+      [
+        { x: -AVG_INDICATOR_WIDTH / 2, y: -AVG_INDICATOR_HEIGHT },
+        { x: AVG_INDICATOR_WIDTH / 2, y: -AVG_INDICATOR_HEIGHT },
+        { x: 0, y: 0 },
+      ],
+      1.5,
+    )
     .fill(AVG_INDICATOR_COLOR);
 
   constructor() {
