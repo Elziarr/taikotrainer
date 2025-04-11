@@ -229,8 +229,8 @@ export class HitObjectsRenderer extends Container {
         this._getVelocity(ho.time) * (ho.time - record.input.time) +
         this._leftMargin;
 
-      sprite.x = -(record.input.time - this._time) + xPos;
-      sprite.y = record.input.time - this._time + this._playfieldHeight / 2;
+      sprite.x = xPos + (this._time - record.input.time);
+      sprite.y = this._playfieldHeight / 2 - (this._time - record.input.time);
       sprite.alpha = 0.008 * (record.input.time - this._time) + 1;
     } else if (
       record &&
