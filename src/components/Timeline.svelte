@@ -48,15 +48,14 @@
   }: Props = $props();
 
   function formatTime(time: number) {
-    const absTime = Math.abs(time);
+    const gte0Time = Math.max(0, time);
 
-    const minutes = Math.floor(absTime / 60000);
-    const seconds = Math.floor((absTime % 60000) / 1000);
+    const minutes = Math.floor(gte0Time / 60000);
+    const seconds = Math.floor((gte0Time % 60000) / 1000);
 
-    const formattedSign = time < 0 ? '-' : '';
     const formattedMinutes = minutes.toString().padStart(2, '0');
     const formattedSeconds = seconds.toString().padStart(2, '0');
-    return `${formattedSign}${formattedMinutes}:${formattedSeconds}`;
+    return `${formattedMinutes}:${formattedSeconds}`;
   }
 </script>
 
@@ -100,14 +99,17 @@
     {onseek}
   />
 
-  <p>{formatTime(time)} / {formatTime(duration)}</p>
+  <div class=" flex">
+    <p class="min-w-12 text-right">{formatTime(time)}</p>
+    /{formatTime(duration)}
+  </div>
 
   <div class="flex items-center gap-2">
-    <p class="flex items-center gap-1">
+    <p class="flex min-w-14 items-center gap-1">
       <MaterialSymbolsSpeedRounded class="inline" />
       {speedMultiplier.toFixed(2)}
     </p>
-    <p class="flex items-center gap-1">
+    <p class="flex min-w-14 items-center gap-1">
       <MaterialSymbolsExpandRounded class="inline rotate-90" />
       {densityMultiplier.toFixed(2)}
     </p>
