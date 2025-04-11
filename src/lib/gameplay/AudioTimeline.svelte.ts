@@ -9,7 +9,7 @@ interface TimelineProps {
   ontick: (time: number) => void;
 }
 
-const SMOOTH_SEEK_FACTOR = 0.07;
+const SMOOTH_SEEK_FACTOR = 0.015;
 
 export class Timeline {
   private _lerpClock: Clock;
