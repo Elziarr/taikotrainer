@@ -219,8 +219,11 @@ export class HitObjectsRenderer extends Container {
 
     const record = this._judgements[ho.index] as HitCircleJudgement;
 
+    if (!record) {
+      return false;
+    }
+
     if (
-      record &&
       record.input !== null &&
       record.judgement !== 'late_miss' &&
       record.judgement !== 'early_miss'
@@ -232,15 +235,15 @@ export class HitObjectsRenderer extends Container {
       sprite.x = xPos + (this._time - record.input.time);
       sprite.y = this._playfieldHeight / 2 - (this._time - record.input.time);
       sprite.alpha = 0.008 * (record.input.time - this._time) + 1;
-    } else if (
-      record &&
-      (record.input === null || record.judgement === 'late_miss')
-    ) {
+    } else if (record.input === null || record.judgement === 'late_miss') {
       sprite.x = defaultXPos;
       sprite.y = this._playfieldHeight / 2;
     }
 
-    this.addChild(sprite);
+    if (record.judgement !== 'early_miss') {
+      this.addChild(sprite);
+    }
+
     return false;
   }
 
