@@ -12,7 +12,7 @@ export class DrumrollSprite extends Container {
     this.body = new TilingSprite({ anchor: { x: 0, y: 0.5 } });
     this.tail = new Sprite({ anchor: { x: 0.5, y: 0.5 } });
 
-    this.addChild(this.body, this.head, this.tail);
+    this.addChild(this.tail, this.body, this.head);
     this._loadTexture();
   }
 
