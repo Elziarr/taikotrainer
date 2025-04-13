@@ -29,10 +29,6 @@ export class Timeline {
   private _onseek: TimelineProps['onseek'];
   private _ontick: TimelineProps['ontick'];
 
-  private _startOffset = $derived(
-    -Howler.ctx.baseLatency * 1000 + GameplaySettings.offset,
-  );
-
   constructor({ onseek, ontick }: TimelineProps) {
     this._lerpClock = new Clock({ ontick: this._lerpTick });
     this._mainClock = new Clock({ ontick: this._tick });
@@ -130,21 +126,22 @@ export class Timeline {
 
     if (
       this._audio?.playing() &&
-      Math.abs(this._time - this._audio.seek() * 1000 - this._startOffset) >
-        RESYNC_THRESHOLD
+      Math.abs(
+        this._time - this._audio.seek() * 1000 - GameplaySettings.offset,
+      ) > RESYNC_THRESHOLD
     ) {
       console.log(123);
-      this._audio.seek((this._time - this._startOffset) / 1000);
+      this._audio.seek((this._time - GameplaySettings.offset) / 1000);
     }
 
     // Time audio playback
     if (
-      this._time >= this._startOffset &&
+      this._time >= GameplaySettings.offset &&
       this._audio &&
       this._boundToPlayAudio
     ) {
       this._audio?.once('play', () =>
-        this._audio?.seek((this._time - this._startOffset) / 1000),
+        this._audio?.seek((this._time - GameplaySettings.offset) / 1000),
       );
       this._audio?.rate(this._speedMultiplier);
       this._audio?.play();
@@ -215,7 +212,7 @@ export class Timeline {
     this._lerpClock.pause();
 
     this._time = time;
-    this._audio?.seek((this._time - this._startOffset) / 1000);
+    this._audio?.seek((this._time - GameplaySettings.offset) / 1000);
 
     if (this._time < 0) {
       this._audio?.stop();

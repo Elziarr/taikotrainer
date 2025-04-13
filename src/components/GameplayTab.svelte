@@ -70,8 +70,8 @@
       class="flex-1"
       id="inputOffset"
       type="number"
-      min="-20"
-      max="20"
+      min="-60"
+      max="60"
       step="1"
       value={settings.offset}
       onchange={e => {
