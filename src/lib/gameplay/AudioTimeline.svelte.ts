@@ -130,7 +130,6 @@ export class Timeline {
         this._time - this._audio.seek() * 1000 - GameplaySettings.offset,
       ) > RESYNC_THRESHOLD
     ) {
-      console.log(123);
       this._audio.seek((this._time - GameplaySettings.offset) / 1000);
     }
 
