@@ -9,6 +9,7 @@ interface TimelineProps {
   ontick: (time: number) => void;
 }
 
+const RESYNC_THRESHOLD = 15;
 const SMOOTH_SEEK_FACTOR = 0.015;
 
 export class Timeline {
@@ -126,6 +127,15 @@ export class Timeline {
   private _tick = (timestamp: DOMHighResTimeStamp, dt: DOMHighResTimeStamp) => {
     this._time = this._time + dt * this._speedMultiplier;
     this._startTimestamp = timestamp - this._time;
+
+    if (
+      this._audio?.playing() &&
+      Math.abs(this._time - this._audio.seek() * 1000 - this._startOffset) >
+        RESYNC_THRESHOLD
+    ) {
+      console.log(123);
+      this._audio.seek((this._time - this._startOffset) / 1000);
+    }
 
     // Time audio playback
     if (
