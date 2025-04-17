@@ -2,7 +2,10 @@ import { AudioSettings } from './settings/audio.svelte';
 import { Howl } from 'howler';
 
 const bigDonSound = new Howl({
-  src: ['sfx/big_don.ogg'],
+  src: ['sfx/big_don.wav'],
+});
+const bigKaSound = new Howl({
+  src: ['sfx/big_ka.wav'],
 });
 const donSound = new Howl({
   src: ['sfx/don.wav'],
@@ -25,8 +28,7 @@ export class SfxPlayer {
   }
 
   playBigKa() {
-    // TODO
-    bigDonSound.play();
+    bigKaSound.play();
   }
 
   playDon() {
