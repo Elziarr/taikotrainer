@@ -37,7 +37,7 @@ export class Timeline {
     this._ontick = ontick;
 
     $effect(() => {
-      this._audio?.volume(AudioSettings.musicVolume);
+      this._audio?.volume(AudioSettings.musicVolume * 0.85);
     });
   }
 
