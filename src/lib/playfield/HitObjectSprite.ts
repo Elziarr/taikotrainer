@@ -7,11 +7,11 @@ export class HitCircleSprite extends Sprite {
     });
   }
 
-  async setType(isKa: boolean, isBig: boolean) {
+  setType(isKa: boolean, isBig: boolean) {
     if (isKa) {
-      this.texture = await Assets.load('hitcircle_ka' + (isBig ? '_big' : ''));
+      this.texture = Assets.get('hitcircle_ka' + (isBig ? '_big' : ''));
     } else {
-      this.texture = await Assets.load('hitcircle_don' + (isBig ? '_big' : ''));
+      this.texture = Assets.get('hitcircle_don' + (isBig ? '_big' : ''));
     }
   }
 }
