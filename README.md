@@ -1,6 +1,6 @@
 # taikotrainer
 
-A gameplay trainer for .tja and .osu taiko charts. Apart from viewing and playing charts starting from any point, features for speed change, density change, and checkpoints are also supported! Try it out right now [here]().
+A gameplay trainer for .tja and .osu taiko charts. Apart from viewing and playing charts starting from any point, features for speed change, density change, and checkpoints are also supported! Try it out right now [here](https://elziarr.github.io/taikotrainer/).
 
 ## Key Features
 
