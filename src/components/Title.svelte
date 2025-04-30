@@ -15,7 +15,7 @@
 
   <a
     class="ml-3 flex min-h-8 min-w-8 items-center justify-center text-xl hover:brightness-125 active:brightness-95"
-    href="https://www.youtube.com/"
+    href="https://github.com/Elziarr/taikotrainer"
     target="_blank"
   >
     <OcticonMarkGithub16 class="text-neutral-400" />
