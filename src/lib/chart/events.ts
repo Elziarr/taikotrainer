@@ -59,11 +59,18 @@ export class TimingEvent extends BeatmapEvent {
 
   linesVisibleAt(time: number) {
     for (const [i, { hideTime, showTime }] of this.visibilityPoints.entries()) {
-      if (time >= showTime && time < this.visibilityPoints[i + 1]?.hideTime) {
+      const flooredTime = Math.floor(time);
+      const flooredShowTime = Math.floor(showTime);
+      const flooredHideTime = Math.floor(hideTime);
+      const flooredNextHideTime = Math.floor(
+        this.visibilityPoints[i + 1]?.hideTime,
+      );
+
+      if (flooredTime >= flooredShowTime && flooredTime < flooredNextHideTime) {
         return true;
       }
 
-      if (time >= hideTime && time < showTime) {
+      if (flooredTime >= flooredHideTime && flooredTime < flooredShowTime) {
         return false;
       }
     }
