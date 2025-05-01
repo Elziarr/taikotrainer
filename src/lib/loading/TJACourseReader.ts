@@ -43,6 +43,7 @@ export class TJACourseReader {
   private _lastHandledCommandIndex = 0;
   private _lastHandledTimingEventIndex: number | null = null;
   private _lastKiaiStartTime = 0;
+  private _linesOff = false;
   private _parseState = 'neutral' as ParseState;
   private _sequenceNoteCount = 0;
   private _time = 0;
@@ -73,6 +74,8 @@ export class TJACourseReader {
       return;
     }
 
+    this._linesOff = true;
+
     const currTimingEvt = this._timingEvents[this._timingEvents.length - 1];
     currTimingEvt.visibilityPoints.push({
       hideTime: this._time,
@@ -91,6 +94,8 @@ export class TJACourseReader {
       this._i += 1;
       return;
     }
+
+    this._linesOff = false;
 
     const currTimingEvt = this._timingEvents[this._timingEvents.length - 1];
     if (currTimingEvt.visibilityPoints.length === 0) {
@@ -141,6 +146,14 @@ export class TJACourseReader {
       this._lastHandledTimingEventIndex === null
     ) {
       this._lastHandledTimingEventIndex = this._timingEvents.length - 1;
+    }
+
+    if (this._linesOff) {
+      const currTimingEvt = this._timingEvents[this._timingEvents.length - 1];
+      currTimingEvt.visibilityPoints.push({
+        hideTime: this._time,
+        showTime: Infinity,
+      });
     }
 
     this._i += 1;
@@ -254,6 +267,14 @@ export class TJACourseReader {
       this._lastHandledTimingEventIndex === null
     ) {
       this._lastHandledTimingEventIndex = this._timingEvents.length - 1;
+    }
+
+    if (this._linesOff) {
+      const currTimingEvt = this._timingEvents[this._timingEvents.length - 1];
+      currTimingEvt.visibilityPoints.push({
+        hideTime: this._time,
+        showTime: Infinity,
+      });
     }
 
     this._i += 1;
