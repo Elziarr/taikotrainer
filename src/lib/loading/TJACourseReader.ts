@@ -41,6 +41,7 @@ export class TJACourseReader {
   private _i = 0;
   private _heldObjectState: HeldObjectState | null = null;
   private _lastHandledCommandIndex = 0;
+  private _lastHandledTimingEventIndex: number | null = null;
   private _lastKiaiStartTime = 0;
   private _parseState = 'neutral' as ParseState;
   private _sequenceNoteCount = 0;
@@ -133,6 +134,13 @@ export class TJACourseReader {
           60000 / this._bpm,
         ),
       );
+    }
+
+    if (
+      this._parseState === 'noteparsing' &&
+      this._lastHandledTimingEventIndex === null
+    ) {
+      this._lastHandledTimingEventIndex = this._timingEvents.length - 1;
     }
 
     this._i += 1;
@@ -241,6 +249,13 @@ export class TJACourseReader {
       );
     }
 
+    if (
+      this._parseState === 'noteparsing' &&
+      this._lastHandledTimingEventIndex === null
+    ) {
+      this._lastHandledTimingEventIndex = this._timingEvents.length - 1;
+    }
+
     this._i += 1;
     this._lastHandledCommandIndex = this._i;
   }
@@ -290,6 +305,16 @@ export class TJACourseReader {
     if (cmd.notes.at(-1)?.isMeasureEnd) {
       this._sequenceNoteCount = 0;
       this._parseState = 'neutral';
+
+      if (this._lastHandledTimingEventIndex !== null) {
+        this._timingEvents
+          .slice(this._lastHandledTimingEventIndex)
+          .forEach(timingEvt => {
+            timingEvt.lineStartTime = this._time;
+          });
+
+        this._lastHandledTimingEventIndex = null;
+      }
     }
 
     this._i += 1;

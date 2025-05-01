@@ -31,6 +31,7 @@ export class TimingEvent extends BeatmapEvent {
    * Time length of a musical beat.
    */
   beatLength: number;
+  lineStartTime: number;
   /**
    * Time length of a musical measure
    */
@@ -50,6 +51,7 @@ export class TimingEvent extends BeatmapEvent {
     super(time);
 
     this.beatLength = beatLength;
+    this.lineStartTime = time;
     this.measureLength = measureLength;
     this.timingLength = timingLength;
     this.visibilityPoints = [];

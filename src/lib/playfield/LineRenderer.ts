@@ -48,10 +48,10 @@ export class LineRenderer extends Container {
 
     const nearestPriorLineTime = nearestPriorMultiple(
       timingEvt.measureLength,
-      timingEvt.time,
+      timingEvt.lineStartTime,
       this._time - compensationOffset,
     );
-    return Math.max(nearestPriorLineTime, timingEvt.time);
+    return Math.max(nearestPriorLineTime, timingEvt.lineStartTime);
   }
 
   private _render() {
