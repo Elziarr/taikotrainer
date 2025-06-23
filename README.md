@@ -1,4 +1,4 @@
-# taikotrainer
+# TaikoTrainer
 
 A gameplay trainer for .tja and .osu taiko charts. Apart from viewing and playing charts starting from any point, features for speed change, density change, and checkpoints are also supported! Try it out right now [here](https://elziarr.github.io/taikotrainer/).
 
@@ -14,4 +14,5 @@ A gameplay trainer for .tja and .osu taiko charts. Apart from viewing and playin
 ## Key Roadmap
 
 - Add proper controller support (I can only test on keyboard right now 🥺)
+- Support upload from .zip or .osu file directly instead of having to extract to folder
 - Properly support branches in .tja charts (it defaults to the hardest branch right now)
